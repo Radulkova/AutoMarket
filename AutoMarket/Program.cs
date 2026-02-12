@@ -4,38 +4,53 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Prefer configured connection string, but fall back to LocalDB so the app will use LocalDB if none is provided.
+// ===============================
+// Database
+// ===============================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=(localdb)\\mssqllocaldb;Database=AutoMarketDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// ===============================
+// Identity + Roles
+// ===============================
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    // За обучение/тест: да можеш да логваш веднага без email confirmation
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // (по желание) по-лесни пароли докато тестваш:
+    // options.Password.RequiredLength = 6;
+    // options.Password.RequireNonAlphanumeric = false;
+    // options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// ===============================
+// MVC + Razor Pages (Identity UI)
+// ===============================
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Apply any pending EF Core migrations on startup so the LocalDB database is created/updated automatically.
+// ===============================
+// Apply migrations (create/update DB)
+// ===============================
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    try
-    {
-        var db = services.GetRequiredService<ApplicationDbContext>();
-        db.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetService<ILogger<Program>>();
-        logger?.LogError(ex, "An error occurred while migrating the database.");
-    }
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
+// ===============================
+// Middleware pipeline
+// ===============================
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -43,23 +58,32 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
+// 🔥 ЗАДЪЛЖИТЕЛНО за Identity
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// ===============================
+// Routes
+// ===============================
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages()
-   .WithStaticAssets();
+// 🔥 ЗАДЪЛЖИТЕЛНО за /Identity/Account/Login и Register
+app.MapRazorPages();
+
+// ===============================
+// Seed roles + users (по новия модел)
+// ===============================
+await IdentitySeed.SeedAsync(app.Services);
 
 app.Run();
+
