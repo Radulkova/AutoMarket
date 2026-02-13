@@ -1,0 +1,40 @@
+﻿@model AutoMarket.Models.Car
+
+<h1>@Model.CarModel.Make.Name @Model.CarModel.Name</h1>
+
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <img src="@Model.ImageUrl" alt="Car image" style="max-width:400px;" />
+}
+
+<p><b>Година:</b> @Model.Year</p>
+<p><b>Пробег (km):</b> @Model.MileageKm</p>
+<p><b>Двигател (cc):</b> @Model.EngineCapacityCc</p>
+<p><b>Конски сили:</b> @Model.HorsePower</p>
+<p><b>Гориво:</b> @Model.FuelType</p>
+<p><b>Скоростна кутия:</b> @Model.Transmission</p>
+<p><b>Цена:</b> @Model.Price</p>
+
+@if (!string.IsNullOrEmpty(Model.Description))
+{
+    <p><b>Description:</b> @Model.Description</p>
+}
+@if (User.IsInRole("Admin"))
+{
+    <div class="mt-3 d-flex gap-2">
+        <a class="btn btn-warning"
+           asp-controller="Cars"
+           asp-action="Edit"
+           asp-route-id="@Model.Id">
+            Редактирай
+        </a>
+
+        <form asp-controller="Cars"
+              asp-action="Delete"
+              asp-route-id="@Model.Id"
+              method="post"
+              onsubmit="return confirm('Сигурна ли си, че искаш да изтриеш тази обява?');">
+            <button type="submit" class="btn btn-danger">Изтрий</button>
+        </form>
+    </div>
+}

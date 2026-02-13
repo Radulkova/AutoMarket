@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoMarket.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260212100723_Initial")]
-    partial class Initial
+    [Migration("20260213074349_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,6 +102,26 @@ namespace AutoMarket.Migrations
                     b.HasIndex("MakeId");
 
                     b.ToTable("CarModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            MakeId = 1,
+                            Name = "3 Series"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            MakeId = 2,
+                            Name = "A4"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            MakeId = 3,
+                            Name = "Corolla"
+                        });
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Make", b =>
@@ -120,6 +140,23 @@ namespace AutoMarket.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Makes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "BMW"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Audi"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Toyota"
+                        });
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Order", b =>
@@ -292,12 +329,10 @@ namespace AutoMarket.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -334,12 +369,10 @@ namespace AutoMarket.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

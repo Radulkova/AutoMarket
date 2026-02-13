@@ -34,7 +34,7 @@ namespace AutoMarket.Data
 
             await EnsureUserWithRole(userManager, logger, "admin@automarket.bg", "Admin123!", "Admin");
             // По желание тест клиент:
-            // await EnsureUserWithRole(userManager, logger, "client@automarket.bg", "Client123!", "Client");
+             await EnsureUserWithRole(userManager, logger, "client@automarket.bg", "Client123!", "Client");
         }
 
         private static async Task EnsureUserWithRole(

@@ -1,0 +1,61 @@
+﻿@model IEnumerable<AutoMarket.Models.Car>
+
+@{
+    ViewData["Title"] = "Коли";
+}
+
+<h1 class="mb-4">Налични автомобили</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Все още няма добавени автомобили.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var car in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    @if (!string.IsNullOrEmpty(car.ImageUrl))
+                    {
+                        <img src="@car.ImageUrl" class="card-img-top" style="height:220px; object-fit:cover;">
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top">
+                    }
+
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            @car.CarModel.Make.Name @car.CarModel.Name
+                        </h5>
+
+                        <p class="card-text mb-1">
+                            <b>Година:</b> @car.Year
+                        </p>
+
+                        <p class="card-text mb-1">
+                            <b>Пробег:</b> @car.MileageKm км
+                        </p>
+
+                        <p class="card-text">
+                            <b>Цена:</b> @car.Price лв.
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0">
+                        <a asp-action="Details" asp-route-id="@car.Id" class="btn btn-outline-primary w-100">
+                            Виж детайли
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+}
+

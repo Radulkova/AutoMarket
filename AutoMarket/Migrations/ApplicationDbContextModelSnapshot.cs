@@ -99,6 +99,26 @@ namespace AutoMarket.Migrations
                     b.HasIndex("MakeId");
 
                     b.ToTable("CarModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            MakeId = 1,
+                            Name = "3 Series"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            MakeId = 2,
+                            Name = "A4"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            MakeId = 3,
+                            Name = "Corolla"
+                        });
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Make", b =>
@@ -117,6 +137,23 @@ namespace AutoMarket.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Makes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "BMW"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Audi"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Toyota"
+                        });
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Order", b =>

@@ -1,4 +1,5 @@
 using AutoMarket.Data;
+using AutoMarket.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,27 +21,26 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 // ===============================
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    // За обучение/тест: да можеш да логваш веднага без email confirmation
     options.SignIn.RequireConfirmedAccount = false;
-
-    // (по желание) по-лесни пароли докато тестваш:
-    // options.Password.RequiredLength = 6;
-    // options.Password.RequireNonAlphanumeric = false;
-    // options.Password.RequireUppercase = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
 // ===============================
-// MVC + Razor Pages (Identity UI)
+// MVC + Razor Pages
 // ===============================
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+// ===============================
+// Services
+// ===============================
+builder.Services.AddScoped<ICarService, CarService>();
+
 var app = builder.Build();
 
 // ===============================
-// Apply migrations (create/update DB)
+// Apply migrations
 // ===============================
 using (var scope = app.Services.CreateScope())
 {
@@ -49,7 +49,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ===============================
-// Middleware pipeline
+// Pipeline
 // ===============================
 if (app.Environment.IsDevelopment())
 {
@@ -66,7 +66,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 🔥 ЗАДЪЛЖИТЕЛНО за Identity
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -77,13 +76,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 🔥 ЗАДЪЛЖИТЕЛНО за /Identity/Account/Login и Register
 app.MapRazorPages();
 
 // ===============================
-// Seed roles + users (по новия модел)
+// Seed roles + users
 // ===============================
 await IdentitySeed.SeedAsync(app.Services);
 
 app.Run();
-
