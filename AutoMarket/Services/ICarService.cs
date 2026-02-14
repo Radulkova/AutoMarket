@@ -1,5 +1,6 @@
 ﻿using AutoMarket.Models;
 using AutoMarket.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AutoMarket.Services
 {
@@ -8,12 +9,12 @@ namespace AutoMarket.Services
         Task<IEnumerable<Car>> GetAllAsync();
         Task<Car?> GetByIdAsync(int id);
 
-        Task AddAsync(CarCreateViewModel model, string sellerId);
+        Task<List<SelectListItem>> GetCarModelsForSelectAsync();
 
-        // ✅ Edit/Delete
+        Task<bool> AddAsync(CarCreateViewModel model, string sellerId);
+
         Task<CarEditViewModel?> GetForEditAsync(int id);
         Task<bool> UpdateAsync(int id, CarEditViewModel model);
         Task<bool> DeleteAsync(int id);
     }
 }
-

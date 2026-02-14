@@ -36,6 +36,8 @@ builder.Services.AddRazorPages();
 // Services
 // ===============================
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICarModelService, CarModelService>();
+
 
 var app = builder.Build();
 

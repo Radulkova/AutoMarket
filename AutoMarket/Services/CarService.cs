@@ -1,6 +1,7 @@
 ﻿using AutoMarket.Data;
 using AutoMarket.Models;
 using AutoMarket.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutoMarket.Services
@@ -30,11 +31,24 @@ namespace AutoMarket.Services
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task AddAsync(CarCreateViewModel model, string sellerId)
+        public async Task<List<SelectListItem>> GetCarModelsForSelectAsync()
+        {
+            return await context.CarModels
+                .Include(cm => cm.Make)
+                .OrderBy(cm => cm.Make.Name)
+                .ThenBy(cm => cm.Name)
+                .Select(cm => new SelectListItem
+                {
+                    Value = cm.Id.ToString(),
+                    Text = cm.Make.Name + " " + cm.Name
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> AddAsync(CarCreateViewModel model, string sellerId)
         {
             var exists = await context.CarModels.AnyAsync(cm => cm.Id == model.CarModelId);
-            if (!exists)
-                throw new ArgumentException("CarModelId is invalid or missing.");
+            if (!exists) return false;
 
             var car = new Car
             {
@@ -53,11 +67,9 @@ namespace AutoMarket.Services
 
             context.Cars.Add(car);
             await context.SaveChangesAsync();
+            return true;
         }
 
-        // ==========================
-        // ✅ EDIT (GET data)
-        // ==========================
         public async Task<CarEditViewModel?> GetForEditAsync(int id)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
@@ -77,9 +89,6 @@ namespace AutoMarket.Services
             };
         }
 
-        // ==========================
-        // ✅ EDIT (UPDATE)
-        // ==========================
         public async Task<bool> UpdateAsync(int id, CarEditViewModel model)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
@@ -99,9 +108,6 @@ namespace AutoMarket.Services
             return true;
         }
 
-        // ==========================
-        // ✅ DELETE
-        // ==========================
         public async Task<bool> DeleteAsync(int id)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);

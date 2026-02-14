@@ -32,13 +32,17 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cars" asp-action="Index">Cars</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cars" asp-action="Index">Коли</a>
                         </li>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Cars" asp-action="Create">Add Car</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Cars" asp-action="Create">Добави кола</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="CarModels" asp-action="Create">Добави модел</a>
                             </li>
                         }
 

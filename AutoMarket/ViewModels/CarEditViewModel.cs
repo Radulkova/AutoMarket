@@ -29,4 +29,3 @@ namespace AutoMarket.ViewModels
         public string? ImageUrl { get; set; }
     }
 }
-

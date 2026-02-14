@@ -7,22 +7,23 @@
 <h1 class="mb-4">Добавяне на автомобил</h1>
 
 <form method="post" class="row g-3">
-
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="col-md-4">
-        <label asp-for="CarModelId" class="form-label">Модел (ID)</label>
-        <input asp-for="CarModelId" class="form-control" />
+    <div class="col-md-6">
+        <label asp-for="CarModelId" class="form-label">Модел</label>
+        <select asp-for="CarModelId" asp-items="Model.CarModels" class="form-select">
+            <option value="0">-- Изберете модел --</option>
+        </select>
         <span asp-validation-for="CarModelId" class="text-danger"></span>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label asp-for="Year" class="form-label">Година</label>
         <input asp-for="Year" class="form-control" />
         <span asp-validation-for="Year" class="text-danger"></span>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label asp-for="Price" class="form-label">Цена</label>
         <input asp-for="Price" class="form-control" />
         <span asp-validation-for="Price" class="text-danger"></span>

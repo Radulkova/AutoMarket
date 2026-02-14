@@ -15,14 +15,12 @@ namespace AutoMarket.Controllers
             this.service = service;
         }
 
-        // LIST
         public async Task<IActionResult> Index()
         {
             var cars = await service.GetAllAsync();
             return View(cars);
         }
 
-        // DETAILS
         public async Task<IActionResult> Details(int id)
         {
             var car = await service.GetByIdAsync(id);
@@ -30,43 +28,54 @@ namespace AutoMarket.Controllers
             return View(car);
         }
 
-        // CREATE (GET)
+        // ==========================
+        // CREATE
+        // ==========================
         [Authorize(Roles = "Admin")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new CarCreateViewModel
+            {
+                CarModels = await service.GetCarModelsForSelectAsync(),
+                FuelType = "Бензин",
+                Transmission = "Ръчна"
+            };
+
+            return View(model);
         }
 
-        // CREATE (POST)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CarCreateViewModel model)
         {
+            model.CarModels = await service.GetCarModelsForSelectAsync();
+
             if (!ModelState.IsValid)
                 return View(model);
 
             var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            await service.AddAsync(model, sellerId!);
+            var ok = await service.AddAsync(model, sellerId!);
+            if (!ok)
+            {
+                ModelState.AddModelError(nameof(model.CarModelId), "Моля, изберете модел от списъка.");
+                return View(model);
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
         // ==========================
-        // ✅ EDIT (GET)
+        // EDIT
         // ==========================
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var model = await service.GetForEditAsync(id);
             if (model == null) return NotFound();
-
             return View(model);
         }
 
-        // ==========================
-        // ✅ EDIT (POST)
-        // ==========================
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, CarEditViewModel model)
@@ -81,7 +90,7 @@ namespace AutoMarket.Controllers
         }
 
         // ==========================
-        // ✅ DELETE (POST)
+        // DELETE
         // ==========================
         [HttpPost]
         [Authorize(Roles = "Admin")]

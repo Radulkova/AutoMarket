@@ -1,0 +1,41 @@
+﻿@model AutoMarket.ViewModels.CarModelCreateViewModel
+
+@{
+    ViewData["Title"] = "Добави модел";
+}
+
+<h1 class="mb-4">Добавяне на модел</h1>
+
+<form method="post" class="row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label class="form-label">Марка (избери от списък)</label>
+        <select asp-for="MakeId" asp-items="Model.Makes" class="form-select">
+            <option value="">-- Изберете марка --</option>
+        </select>
+        <span asp-validation-for="MakeId" class="text-danger"></span>
+        <div class="form-text">Ако марката я няма – напиши я в полето вдясно.</div>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="NewMakeName" class="form-label">Нова марка (ако не съществува)</label>
+        <input asp-for="NewMakeName" class="form-control" placeholder="напр. Ford" />
+        <span asp-validation-for="NewMakeName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label">Модел</label>
+        <input asp-for="Name" class="form-control" placeholder="напр. Mustang" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <a asp-controller="Cars" asp-action="Create" class="btn btn-outline-secondary">Назад към обява</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
