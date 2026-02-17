@@ -85,4 +85,6 @@ app.MapRazorPages();
 // ===============================
 await IdentitySeed.SeedAsync(app.Services);
 
+await AutoMarket.Data.AppDataSeed.SeedAsync(app.Services);
+
 app.Run();

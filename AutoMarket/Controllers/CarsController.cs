@@ -2,6 +2,7 @@
 using AutoMarket.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace AutoMarket.Controllers
@@ -15,12 +16,44 @@ namespace AutoMarket.Controllers
             this.service = service;
         }
 
-        public async Task<IActionResult> Index()
+        // ==========================
+        // INDEX (filters + results)
+        // ==========================
+        [HttpGet]
+        public async Task<IActionResult> Index([FromQuery] CarsQueryViewModel query)
         {
-            var cars = await service.GetAllAsync();
-            return View(cars);
+            // Dropdown: Makes
+            var makes = await service.GetMakesAsync();
+            query.Makes = makes
+                .Select(m => new SelectListItem(m.name, m.id.ToString()))
+                .ToList();
+
+            // Dropdown: Models (depends on MakeId)
+            var models = await service.GetModelsAsync(query.MakeId);
+            query.CarModels = models
+                .Select(m => new SelectListItem(m.name, m.id.ToString()))
+                .ToList();
+
+            // Results
+            var (cars, total) = await service.SearchAsync(query);
+            query.Cars = cars;
+            query.TotalCount = total;
+
+            return View(query);
         }
 
+        // AJAX endpoint: връща модели за избрана марка
+        // GET: /Cars/ModelsByMake?makeId=1
+        [HttpGet]
+        public async Task<IActionResult> ModelsByMake(int makeId)
+        {
+            var models = await service.GetModelsAsync(makeId);
+            return Json(models.Select(m => new { id = m.id, name = m.name }));
+        }
+
+        // ==========================
+        // DETAILS
+        // ==========================
         public async Task<IActionResult> Details(int id)
         {
             var car = await service.GetByIdAsync(id);
@@ -46,6 +79,7 @@ namespace AutoMarket.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CarCreateViewModel model)
         {
             model.CarModels = await service.GetCarModelsForSelectAsync();
@@ -54,8 +88,8 @@ namespace AutoMarket.Controllers
                 return View(model);
 
             var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var ok = await service.AddAsync(model, sellerId!);
+
             if (!ok)
             {
                 ModelState.AddModelError(nameof(model.CarModelId), "Моля, изберете модел от списъка.");
@@ -78,6 +112,7 @@ namespace AutoMarket.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CarEditViewModel model)
         {
             if (!ModelState.IsValid)
@@ -94,6 +129,7 @@ namespace AutoMarket.Controllers
         // ==========================
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var ok = await service.DeleteAsync(id);

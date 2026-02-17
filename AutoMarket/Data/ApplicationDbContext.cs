@@ -1,11 +1,10 @@
 ﻿using AutoMarket.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutoMarket.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -21,23 +20,18 @@ namespace AutoMarket.Data
         {
             base.OnModelCreating(builder);
 
+            // (по желание) връзки/ограничения ако искаш да са explicit
+            builder.Entity<CarModel>()
+                .HasOne(cm => cm.Make)
+                .WithMany()
+                .HasForeignKey(cm => cm.MakeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Car>()
-                .Property(c => c.Price)
-                .HasPrecision(18, 2);
-
-            // ✅ Seed Makes
-            builder.Entity<Make>().HasData(
-                new Make { Id = 1, Name = "BMW" },
-                new Make { Id = 2, Name = "Audi" },
-                new Make { Id = 3, Name = "Toyota" }
-            );
-
-            // ✅ Seed CarModels
-            builder.Entity<CarModel>().HasData(
-                new CarModel { Id = 1, Name = "3 Series", MakeId = 1 },
-                new CarModel { Id = 2, Name = "A4", MakeId = 2 },
-                new CarModel { Id = 3, Name = "Corolla", MakeId = 3 }
-            );
+                .HasOne(c => c.CarModel)
+                .WithMany()
+                .HasForeignKey(c => c.CarModelId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

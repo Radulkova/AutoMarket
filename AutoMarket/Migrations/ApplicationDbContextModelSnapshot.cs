@@ -33,6 +33,9 @@ namespace AutoMarket.Migrations
                     b.Property<int>("CarModelId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CarModelId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -56,7 +59,6 @@ namespace AutoMarket.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SellerId")
@@ -75,6 +77,8 @@ namespace AutoMarket.Migrations
 
                     b.HasIndex("CarModelId");
 
+                    b.HasIndex("CarModelId1");
+
                     b.ToTable("Cars");
                 });
 
@@ -89,6 +93,9 @@ namespace AutoMarket.Migrations
                     b.Property<int>("MakeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MakeId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -98,27 +105,9 @@ namespace AutoMarket.Migrations
 
                     b.HasIndex("MakeId");
 
-                    b.ToTable("CarModels");
+                    b.HasIndex("MakeId1");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            MakeId = 1,
-                            Name = "3 Series"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            MakeId = 2,
-                            Name = "A4"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            MakeId = 3,
-                            Name = "Corolla"
-                        });
+                    b.ToTable("CarModels");
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Make", b =>
@@ -137,23 +126,6 @@ namespace AutoMarket.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Makes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "BMW"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Audi"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Toyota"
-                        });
                 });
 
             modelBuilder.Entity("AutoMarket.Models.Order", b =>
@@ -382,10 +354,14 @@ namespace AutoMarket.Migrations
             modelBuilder.Entity("AutoMarket.Models.Car", b =>
                 {
                     b.HasOne("AutoMarket.Models.CarModel", "CarModel")
-                        .WithMany("Cars")
+                        .WithMany()
                         .HasForeignKey("CarModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("AutoMarket.Models.CarModel", null)
+                        .WithMany("Cars")
+                        .HasForeignKey("CarModelId1");
 
                     b.Navigation("CarModel");
                 });
@@ -393,10 +369,14 @@ namespace AutoMarket.Migrations
             modelBuilder.Entity("AutoMarket.Models.CarModel", b =>
                 {
                     b.HasOne("AutoMarket.Models.Make", "Make")
-                        .WithMany("Models")
+                        .WithMany()
                         .HasForeignKey("MakeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("AutoMarket.Models.Make", null)
+                        .WithMany("Models")
+                        .HasForeignKey("MakeId1");
 
                     b.Navigation("Make");
                 });
