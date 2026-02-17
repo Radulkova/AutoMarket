@@ -20,7 +20,7 @@ namespace AutoMarket.Services
             return await context.Cars
                 .AsNoTracking()
                 .Include(c => c.CarModel)
-                    .ThenInclude(cm => cm.Make)
+                .ThenInclude(cm => cm.Make)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
         }
@@ -30,13 +30,13 @@ namespace AutoMarket.Services
             return await context.Cars
                 .AsNoTracking()
                 .Include(c => c.CarModel)
-                    .ThenInclude(cm => cm.Make)
+                .ThenInclude(cm => cm.Make)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        // ==========================
+        // --------------------------
         // CREATE helpers
-        // ==========================
+        // --------------------------
         public async Task<List<SelectListItem>> GetCarModelsForSelectAsync()
         {
             return await context.CarModels
@@ -54,7 +54,6 @@ namespace AutoMarket.Services
 
         public async Task<bool> AddAsync(CarCreateViewModel model, string sellerId)
         {
-            // защита: да не се записва кола с невалиден модел
             var exists = await context.CarModels.AnyAsync(cm => cm.Id == model.CarModelId);
             if (!exists) return false;
 
@@ -68,8 +67,8 @@ namespace AutoMarket.Services
                 HorsePower = model.HorsePower,
                 FuelType = model.FuelType,
                 Transmission = model.Transmission,
-                Description = model.Description,
-                ImageUrl = model.ImageUrl,
+                Description = model.Description ?? "",
+                ImageUrl = model.ImageUrl ?? "",
                 SellerId = sellerId
             };
 
@@ -78,9 +77,9 @@ namespace AutoMarket.Services
             return true;
         }
 
-        // ==========================
+        // --------------------------
         // EDIT
-        // ==========================
+        // --------------------------
         public async Task<CarEditViewModel?> GetForEditAsync(int id)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
@@ -112,16 +111,16 @@ namespace AutoMarket.Services
             car.HorsePower = model.HorsePower;
             car.FuelType = model.FuelType;
             car.Transmission = model.Transmission;
-            car.Description = model.Description;
-            car.ImageUrl = model.ImageUrl;
+            car.Description = model.Description ?? "";
+            car.ImageUrl = model.ImageUrl ?? "";
 
             await context.SaveChangesAsync();
             return true;
         }
 
-        // ==========================
+        // --------------------------
         // DELETE
-        // ==========================
+        // --------------------------
         public async Task<bool> DeleteAsync(int id)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
@@ -132,9 +131,9 @@ namespace AutoMarket.Services
             return true;
         }
 
-        // ==========================
-        // Mobile.bg style dropdowns
-        // ==========================
+        // --------------------------
+        // Dropdowns (Mobile.bg style)
+        // --------------------------
         public async Task<List<(int id, string name)>> GetMakesAsync()
         {
             return await context.Makes
@@ -157,9 +156,9 @@ namespace AutoMarket.Services
                 .ToListAsync();
         }
 
-        // ==========================
-        // SEARCH (без paging, за да няма грешки)
-        // ==========================
+        // --------------------------
+        // Search + Paging
+        // --------------------------
         public async Task<(IEnumerable<Car> cars, int totalCount)> SearchAsync(CarsQueryViewModel query)
         {
             var q = context.Cars
@@ -167,37 +166,30 @@ namespace AutoMarket.Services
                 .Include(c => c.CarModel).ThenInclude(cm => cm.Make)
                 .AsQueryable();
 
-            // Марка
             if (query.MakeId.HasValue && query.MakeId.Value > 0)
                 q = q.Where(c => c.CarModel.MakeId == query.MakeId.Value);
 
-            // Модел
             if (query.CarModelId.HasValue && query.CarModelId.Value > 0)
                 q = q.Where(c => c.CarModelId == query.CarModelId.Value);
 
-            // Гориво (ако е "Всички" или празно -> не филтрираме)
-            if (!string.IsNullOrWhiteSpace(query.FuelType) && query.FuelType != "Всички")
+            if (!string.IsNullOrWhiteSpace(query.FuelType))
                 q = q.Where(c => c.FuelType == query.FuelType);
 
-            // Скорости
-            if (!string.IsNullOrWhiteSpace(query.Transmission) && query.Transmission != "Всички")
+            if (!string.IsNullOrWhiteSpace(query.Transmission))
                 q = q.Where(c => c.Transmission == query.Transmission);
 
-            // Години
             if (query.YearFrom.HasValue)
                 q = q.Where(c => c.Year >= query.YearFrom.Value);
 
             if (query.YearTo.HasValue)
                 q = q.Where(c => c.Year <= query.YearTo.Value);
 
-            // Цена
             if (query.PriceFrom.HasValue)
                 q = q.Where(c => c.Price >= query.PriceFrom.Value);
 
             if (query.PriceTo.HasValue)
                 q = q.Where(c => c.Price <= query.PriceTo.Value);
 
-            // Сортиране
             q = query.Sort switch
             {
                 "price_asc" => q.OrderBy(c => c.Price),
@@ -208,8 +200,12 @@ namespace AutoMarket.Services
             };
 
             var total = await q.CountAsync();
-            var cars = await q.ToListAsync();
 
+            var page = query.Page < 1 ? 1 : query.Page;
+            var pageSize = query.PageSize <= 0 ? 9 : query.PageSize;
+            var skip = (page - 1) * pageSize;
+
+            var cars = await q.Skip(skip).Take(pageSize).ToListAsync();
             return (cars, total);
         }
     }

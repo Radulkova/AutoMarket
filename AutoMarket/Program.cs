@@ -87,4 +87,10 @@ await IdentitySeed.SeedAsync(app.Services);
 
 await AutoMarket.Data.AppDataSeed.SeedAsync(app.Services);
 
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeed.SeedAsync(scope.ServiceProvider);
+    await AppDataSeed.SeedAsync(scope.ServiceProvider);
+}
+
 app.Run();

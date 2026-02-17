@@ -1,4 +1,5 @@
-﻿using AutoMarket.Models;
+﻿using AutoMarket.Data.Models;
+using AutoMarket.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ namespace AutoMarket.Data
         public DbSet<CarModel> CarModels => Set<CarModel>();
         public DbSet<Car> Cars => Set<Car>();
         public DbSet<Order> Orders => Set<Order>();
+        public DbSet<CarImage> CarImages => Set<CarImage>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -32,6 +34,17 @@ namespace AutoMarket.Data
                 .WithMany()
                 .HasForeignKey(c => c.CarModelId)
                 .OnDelete(DeleteBehavior.Restrict);
+          
+            builder.Entity<CarImage>()
+                .HasOne(ci => ci.Car)
+                .WithMany(c => c.Images)
+                .HasForeignKey(ci => ci.CarId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<CarImage>()
+                .Property(ci => ci.Url)
+                .IsRequired()
+                .HasMaxLength(500);
         }
     }
 }

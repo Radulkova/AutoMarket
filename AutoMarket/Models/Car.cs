@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AutoMarket.Data.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace AutoMarket.Models
 {
@@ -40,6 +41,8 @@ namespace AutoMarket.Models
         
         [Required]
         public string SellerId { get; set; } = null!;
+
+        public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
     }
 }
 

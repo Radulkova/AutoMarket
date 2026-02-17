@@ -2,7 +2,6 @@
 using AutoMarket.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace AutoMarket.Controllers
@@ -16,25 +15,16 @@ namespace AutoMarket.Controllers
             this.service = service;
         }
 
-        // ==========================
-        // INDEX (filters + results)
-        // ==========================
+        // Mobile.bg style Index
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] CarsQueryViewModel query)
         {
-            // Dropdown: Makes
             var makes = await service.GetMakesAsync();
-            query.Makes = makes
-                .Select(m => new SelectListItem(m.name, m.id.ToString()))
-                .ToList();
+            query.Makes = makes.Select(m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(m.name, m.id.ToString())).ToList();
 
-            // Dropdown: Models (depends on MakeId)
             var models = await service.GetModelsAsync(query.MakeId);
-            query.CarModels = models
-                .Select(m => new SelectListItem(m.name, m.id.ToString()))
-                .ToList();
+            query.CarModels = models.Select(m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(m.name, m.id.ToString())).ToList();
 
-            // Results
             var (cars, total) = await service.SearchAsync(query);
             query.Cars = cars;
             query.TotalCount = total;
@@ -42,8 +32,7 @@ namespace AutoMarket.Controllers
             return View(query);
         }
 
-        // AJAX endpoint: връща модели за избрана марка
-        // GET: /Cars/ModelsByMake?makeId=1
+        // AJAX: /Cars/ModelsByMake?makeId=1
         [HttpGet]
         public async Task<IActionResult> ModelsByMake(int makeId)
         {
@@ -51,9 +40,6 @@ namespace AutoMarket.Controllers
             return Json(models.Select(m => new { id = m.id, name = m.name }));
         }
 
-        // ==========================
-        // DETAILS
-        // ==========================
         public async Task<IActionResult> Details(int id)
         {
             var car = await service.GetByIdAsync(id);
@@ -61,9 +47,7 @@ namespace AutoMarket.Controllers
             return View(car);
         }
 
-        // ==========================
-        // CREATE
-        // ==========================
+        // CREATE (Admin only)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
@@ -73,7 +57,6 @@ namespace AutoMarket.Controllers
                 FuelType = "Бензин",
                 Transmission = "Ръчна"
             };
-
             return View(model);
         }
 
@@ -99,9 +82,7 @@ namespace AutoMarket.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ==========================
-        // EDIT
-        // ==========================
+        // EDIT (Admin only)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -124,9 +105,7 @@ namespace AutoMarket.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        // ==========================
-        // DELETE
-        // ==========================
+        // DELETE (Admin only)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -134,7 +113,6 @@ namespace AutoMarket.Controllers
         {
             var ok = await service.DeleteAsync(id);
             if (!ok) return NotFound();
-
             return RedirectToAction(nameof(Index));
         }
     }

@@ -12,6 +12,9 @@
 
             <form method="get" class="row g-3 align-items-end" id="filtersForm">
 
+                <input type="hidden" asp-for="Page" value="1" />
+                <input type="hidden" asp-for="PageSize" />
+
                 <div class="col-md-3">
                     <label class="form-label">Марка</label>
                     <select class="form-select" asp-for="MakeId" asp-items="Model.Makes" id="makeSelect">
@@ -94,37 +97,98 @@
         <div class="text-muted">Общо: @Model.TotalCount</div>
     </div>
 
-    <div class="row g-4">
-        @foreach (var car in Model.Cars)
-        {
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@(string.IsNullOrWhiteSpace(car.ImageUrl) ? "/img/cars/no-car.jpg" : car.ImageUrl)"
-                         class="card-img-top"
-                         style="height:220px; object-fit:cover;"
-                         alt="car"
-                         onerror="this.src='/img/no-car.jpg';" />
+    @if (!Model.Cars.Any())
+    {
+        <div class="alert alert-warning">Няма намерени автомобили по избраните критерии.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var car in Model.Cars)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(string.IsNullOrWhiteSpace(car.ImageUrl) ? "/img/no-car.jpg" : car.ImageUrl)"
+                             class="card-img-top" style="height:220px; object-fit:cover;" alt="car" />
+                        <div class="card-body">
+                            <h5 class="card-title">@car.CarModel.Make.Name @car.CarModel.Name</h5>
 
-                    <div class="card-body">
-                        <h5 class="card-title">@car.CarModel.Make.Name @car.CarModel.Name</h5>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <span class="badge text-bg-light">@car.Year</span>
+                                <span class="badge text-bg-light">@car.MileageKm.ToString("N0") км</span>
+                                <span class="badge text-bg-light">@car.FuelType</span>
+                                <span class="badge text-bg-light">@car.Transmission</span>
+                            </div>
 
-                        <div class="d-flex flex-wrap gap-2 mb-2">
-                            <span class="badge text-bg-light">@car.Year</span>
-                            <span class="badge text-bg-light">@car.MileageKm.ToString("N0") км</span>
-                            <span class="badge text-bg-light">@car.FuelType</span>
-                            <span class="badge text-bg-light">@car.Transmission</span>
+                            <div class="fs-5 fw-bold text-primary">@car.Price.ToString("N0") лв.</div>
                         </div>
-
-                        <div class="fs-5 fw-bold text-primary">@car.Price.ToString("N0") лв.</div>
-                    </div>
-
-                    <div class="card-footer bg-white border-0 pb-3">
-                        <a class="btn btn-outline-primary w-100" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a class="btn btn-outline-primary w-100" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+        </div>
+
+        @* Paging *@
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-MakeId="@Model.MakeId"
+                           asp-route-CarModelId="@Model.CarModelId"
+                           asp-route-FuelType="@Model.FuelType"
+                           asp-route-Transmission="@Model.Transmission"
+                           asp-route-YearFrom="@Model.YearFrom"
+                           asp-route-YearTo="@Model.YearTo"
+                           asp-route-PriceFrom="@Model.PriceFrom"
+                           asp-route-PriceTo="@Model.PriceTo"
+                           asp-route-Sort="@Model.Sort"
+                           asp-route-Page="@(Model.Page - 1)"
+                           asp-route-PageSize="@Model.PageSize">←</a>
+                    </li>
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-MakeId="@Model.MakeId"
+                               asp-route-CarModelId="@Model.CarModelId"
+                               asp-route-FuelType="@Model.FuelType"
+                               asp-route-Transmission="@Model.Transmission"
+                               asp-route-YearFrom="@Model.YearFrom"
+                               asp-route-YearTo="@Model.YearTo"
+                               asp-route-PriceFrom="@Model.PriceFrom"
+                               asp-route-PriceTo="@Model.PriceTo"
+                               asp-route-Sort="@Model.Sort"
+                               asp-route-Page="@p"
+                               asp-route-PageSize="@Model.PageSize">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-MakeId="@Model.MakeId"
+                           asp-route-CarModelId="@Model.CarModelId"
+                           asp-route-FuelType="@Model.FuelType"
+                           asp-route-Transmission="@Model.Transmission"
+                           asp-route-YearFrom="@Model.YearFrom"
+                           asp-route-YearTo="@Model.YearTo"
+                           asp-route-PriceFrom="@Model.PriceFrom"
+                           asp-route-PriceTo="@Model.PriceTo"
+                           asp-route-Sort="@Model.Sort"
+                           asp-route-Page="@(Model.Page + 1)"
+                           asp-route-PageSize="@Model.PageSize">→</a>
+                    </li>
+                </ul>
+            </nav>
         }
-    </div>
+    }
 </div>
 
 @section Scripts {
@@ -135,7 +199,6 @@
 
             async function loadModels(makeId, selectedModelId) {
                 modelSelect.innerHTML = '';
-
                 const optAll = document.createElement('option');
                 optAll.value = '';
                 optAll.textContent = 'Всички';
@@ -151,9 +214,7 @@
                     const opt = document.createElement('option');
                     opt.value = m.id;
                     opt.textContent = m.name;
-                    if (selectedModelId && String(selectedModelId) === String(m.id)) {
-                        opt.selected = true;
-                    }
+                    if (selectedModelId && String(selectedModelId) === String(m.id)) opt.selected = true;
                     modelSelect.appendChild(opt);
                 }
             }
@@ -162,12 +223,10 @@
                 await loadModels(makeSelect.value, null);
             });
 
-            // Ако страницата е заредена с избрана марка (query string), зареди моделите ѝ
-            const currentMake = makeSelect.value;
-            const currentModel = '@(Model.CarModelId?.ToString() ?? "")';
-
-            if (currentMake) {
-                loadModels(currentMake, currentModel);
+            // On load: ако има избрана марка, презареди моделите и маркирай текущия модел
+            const selectedModel = modelSelect.value;
+            if (makeSelect.value) {
+                loadModels(makeSelect.value, selectedModel);
             }
         })();
     </script>
