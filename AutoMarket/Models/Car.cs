@@ -1,4 +1,4 @@
-﻿using AutoMarket.Data.Models;
+﻿using AutoMarket.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace AutoMarket.Models

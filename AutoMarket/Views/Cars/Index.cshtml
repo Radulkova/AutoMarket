@@ -4,137 +4,158 @@
     ViewData["Title"] = "Коли";
 }
 
-<div class="container my-4">
+<div class="pd-container">
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title mb-3">Търсене на автомобили</h5>
-
-            <form method="get" class="row g-3 align-items-end" id="filtersForm">
-
-                <input type="hidden" asp-for="Page" value="1" />
-                <input type="hidden" asp-for="PageSize" />
-
-                <div class="col-md-3">
-                    <label class="form-label">Марка</label>
-                    <select class="form-select" asp-for="MakeId" asp-items="Model.Makes" id="makeSelect">
-                        <option value="">Всички</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Модел</label>
-                    <select class="form-select" asp-for="CarModelId" asp-items="Model.CarModels" id="modelSelect">
-                        <option value="">Всички</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Гориво</label>
-                    <select class="form-select" asp-for="FuelType">
-                        <option value="">Всички</option>
-                        <option value="Бензин">Бензин</option>
-                        <option value="Дизел">Дизел</option>
-                        <option value="Хибрид">Хибрид</option>
-                        <option value="Електрическа">Електрическа</option>
-                        <option value="Газ">Газ</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Скорости</label>
-                    <select class="form-select" asp-for="Transmission">
-                        <option value="">Всички</option>
-                        <option value="Ръчна">Ръчна</option>
-                        <option value="Автоматична">Автоматична</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Год. от</label>
-                    <input class="form-control" asp-for="YearFrom" type="number" min="1950" max="2100" />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">до</label>
-                    <input class="form-control" asp-for="YearTo" type="number" min="1950" max="2100" />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Цена от</label>
-                    <input class="form-control" asp-for="PriceFrom" type="number" min="0" />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">до</label>
-                    <input class="form-control" asp-for="PriceTo" type="number" min="0" />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Сортиране</label>
-                    <select class="form-select" asp-for="Sort">
-                        <option value="">Най-нови</option>
-                        <option value="price_asc">Цена ↑</option>
-                        <option value="price_desc">Цена ↓</option>
-                        <option value="km_asc">Пробег ↑</option>
-                        <option value="year_desc">Година ↓</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2 d-grid">
-                    <button class="btn btn-primary" type="submit">Търси</button>
-                </div>
-
-                <div class="col-md-2 d-grid">
-                    <a class="btn btn-outline-secondary" asp-action="Index">Изчисти</a>
-                </div>
-            </form>
+    <!-- HERO -->
+    <div class="pd-hero">
+        <h1>Налични автомобили</h1>
+        <p>Търси, филтрирай и разглеждай обяви в премиум dark стил.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="pd-btn pd-btn-primary" type="button" onclick="document.getElementById('filtersCard').scrollIntoView({behavior:'smooth'})">
+                Филтри
+            </button>
+            <a class="pd-btn" asp-action="Index">Изчисти</a>
+            <span style="color:rgba(255,255,255,.65); align-self:center;">Общо: @Model.TotalCount</span>
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="mb-0">Налични автомобили</h2>
-        <div class="text-muted">Общо: @Model.TotalCount</div>
+    <!-- FILTERS -->
+    <div id="filtersCard" class="pd-surface" style="padding:16px; margin-bottom:18px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div>
+                <h5 style="margin:0; font-weight:800;">Търсене на автомобили</h5>
+                <div style="color:rgba(255,255,255,.65); font-size:14px;">Филтрите работят комбинирано + paging</div>
+            </div>
+        </div>
+
+        <form method="get" class="row g-3 align-items-end mt-1" id="filtersForm">
+            <input type="hidden" asp-for="Page" value="1" />
+            <input type="hidden" asp-for="PageSize" />
+
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Марка</label>
+                <select class="form-select" asp-for="MakeId" asp-items="Model.Makes" id="makeSelect">
+                    <option value="">Всички</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Модел</label>
+                <select class="form-select" asp-for="CarModelId" asp-items="Model.CarModels" id="modelSelect">
+                    <option value="">Всички</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Гориво</label>
+                <select class="form-select" asp-for="FuelType">
+                    <option value="">Всички</option>
+                    <option value="Бензин">Бензин</option>
+                    <option value="Дизел">Дизел</option>
+                    <option value="Хибрид">Хибрид</option>
+                    <option value="Електрическа">Електрическа</option>
+                    <option value="Газ">Газ</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Скорости</label>
+                <select class="form-select" asp-for="Transmission">
+                    <option value="">Всички</option>
+                    <option value="Ръчна">Ръчна</option>
+                    <option value="Автоматична">Автоматична</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Год. от</label>
+                <input class="form-control" asp-for="YearFrom" type="number" min="1950" max="2100" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">до</label>
+                <input class="form-control" asp-for="YearTo" type="number" min="1950" max="2100" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Цена от</label>
+                <input class="form-control" asp-for="PriceFrom" type="number" min="0" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">до</label>
+                <input class="form-control" asp-for="PriceTo" type="number" min="0" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label" style="color:rgba(255,255,255,.75);">Сортиране</label>
+                <select class="form-select" asp-for="Sort">
+                    <option value="">Най-нови</option>
+                    <option value="price_asc">Цена ↑</option>
+                    <option value="price_desc">Цена ↓</option>
+                    <option value="km_asc">Пробег ↑</option>
+                    <option value="year_desc">Година ↓</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button class="pd-btn pd-btn-primary" type="submit">Търси</button>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <a class="pd-btn" asp-action="Index">Изчисти</a>
+            </div>
+        </form>
     </div>
 
+    <!-- RESULTS -->
     @if (!Model.Cars.Any())
     {
-        <div class="alert alert-warning">Няма намерени автомобили по избраните критерии.</div>
+        <div class="pd-surface" style="padding:16px;">
+            <div style="color:rgba(255,255,255,.8); font-weight:700;">Няма намерени автомобили</div>
+            <div style="color:rgba(255,255,255,.65);">Пробвай с по-широки критерии или изчисти филтрите.</div>
+        </div>
     }
     else
     {
-        <div class="row g-4">
+        <div class="pd-grid">
             @foreach (var car in Model.Cars)
             {
-                <div class="col-md-4">
-                    <div class="card h-100 shadow-sm">
-                        <img src="@(string.IsNullOrWhiteSpace(car.ImageUrl) ? "/img/no-car.jpg" : car.ImageUrl)"
-                             class="card-img-top" style="height:220px; object-fit:cover;" alt="car" />
-                        <div class="card-body">
-                            <h5 class="card-title">@car.CarModel.Make.Name @car.CarModel.Name</h5>
+                // Главна снимка от CarImages (Variant B)
+                var mainImg =
+                car.Images?
+                .OrderByDescending(i => i.IsMain)
+                .ThenBy(i => i.SortOrder)
+                .FirstOrDefault()?.Url
+                ?? "/img/no-car.jpg";
 
-                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                <span class="badge text-bg-light">@car.Year</span>
-                                <span class="badge text-bg-light">@car.MileageKm.ToString("N0") км</span>
-                                <span class="badge text-bg-light">@car.FuelType</span>
-                                <span class="badge text-bg-light">@car.Transmission</span>
-                            </div>
+                <div class="pd-card">
+                    <img class="pd-card-img" src="@mainImg" alt="car" />
 
-                            <div class="fs-5 fw-bold text-primary">@car.Price.ToString("N0") лв.</div>
+                    <div class="pd-card-body">
+                        <div class="pd-title">@car.CarModel.Make.Name @car.CarModel.Name</div>
+
+                        <div class="pd-badges">
+                            <span class="pd-badge">@car.Year</span>
+                            <span class="pd-badge">@car.MileageKm.ToString("N0") км</span>
+                            <span class="pd-badge">@car.FuelType</span>
+                            <span class="pd-badge">@car.Transmission</span>
                         </div>
-                        <div class="card-footer bg-white border-0 pb-3">
-                            <a class="btn btn-outline-primary w-100" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
-                        </div>
+
+                        <div class="pd-price">@car.Price.ToString("N0") лв.</div>
+
+                        <a class="pd-btn" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
                     </div>
                 </div>
             }
         </div>
 
-        @* Paging *@
+        <!-- Paging -->
         @if (Model.TotalPages > 1)
         {
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
+
                     <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
                         <a class="page-link"
                            asp-action="Index"
@@ -185,6 +206,7 @@
                            asp-route-Page="@(Model.Page + 1)"
                            asp-route-PageSize="@Model.PageSize">→</a>
                     </li>
+
                 </ul>
             </nav>
         }
@@ -223,7 +245,6 @@
                 await loadModels(makeSelect.value, null);
             });
 
-            // On load: ако има избрана марка, презареди моделите и маркирай текущия модел
             const selectedModel = modelSelect.value;
             if (makeSelect.value) {
                 loadModels(makeSelect.value, selectedModel);

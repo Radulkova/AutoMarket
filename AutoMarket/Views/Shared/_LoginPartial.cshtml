@@ -2,25 +2,50 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+<ul class="navbar-nav align-items-lg-center" style="gap:8px;">
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-white"
+               asp-area="Identity"
+               asp-page="/Account/Manage/Index"
+               title="Профил">
+                👤 Здравей, @User.Identity?.Name!
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <form asp-area="Identity"
+                  asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+                  method="post"
+                  style="margin:0;">
+                <button type="submit"
+                        class="pd-btn"
+                        style="padding:6px 12px;">
+                    Изход
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="pd-btn"
+               asp-area="Identity"
+               asp-page="/Account/Register">
+                Регистрация
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="pd-btn pd-btn-primary"
+               asp-area="Identity"
+               asp-page="/Account/Login">
+                Вход
+            </a>
+        </li>
+    }
+
 </ul>

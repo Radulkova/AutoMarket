@@ -1,7 +1,7 @@
 ﻿using AutoMarket.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace AutoMarket.Data.Models
+namespace AutoMarket.Models
 {
     public class CarImage
     {

@@ -19,8 +19,9 @@ namespace AutoMarket.Services
         {
             return await context.Cars
                 .AsNoTracking()
+                .Include(c => c.Images) // ✅ Variant B
                 .Include(c => c.CarModel)
-                .ThenInclude(cm => cm.Make)
+                    .ThenInclude(cm => cm.Make)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
         }
@@ -29,8 +30,9 @@ namespace AutoMarket.Services
         {
             return await context.Cars
                 .AsNoTracking()
+                .Include(c => c.Images) // ✅ Variant B (за галерия/главна снимка)
                 .Include(c => c.CarModel)
-                .ThenInclude(cm => cm.Make)
+                    .ThenInclude(cm => cm.Make)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -57,6 +59,8 @@ namespace AutoMarket.Services
             var exists = await context.CarModels.AnyAsync(cm => cm.Id == model.CarModelId);
             if (!exists) return false;
 
+            var imageUrl = (model.ImageUrl ?? "").Trim();
+
             var car = new Car
             {
                 CarModelId = model.CarModelId,
@@ -68,9 +72,22 @@ namespace AutoMarket.Services
                 FuelType = model.FuelType,
                 Transmission = model.Transmission,
                 Description = model.Description ?? "",
-                ImageUrl = model.ImageUrl ?? "",
-                SellerId = sellerId
+                SellerId = sellerId,
+
+                // оставяме го за съвместимост (ако някъде още го ползваш)
+                ImageUrl = imageUrl
             };
+
+            // ✅ Variant B: ако има URL, правим го главна снимка в CarImages
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                car.Images.Add(new CarImage
+                {
+                    Url = imageUrl,
+                    IsMain = true,
+                    SortOrder = 0
+                });
+            }
 
             context.Cars.Add(car);
             await context.SaveChangesAsync();
@@ -82,8 +99,21 @@ namespace AutoMarket.Services
         // --------------------------
         public async Task<CarEditViewModel?> GetForEditAsync(int id)
         {
-            var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
+            var car = await context.Cars
+                .AsNoTracking()
+                .Include(c => c.Images) // ✅ Variant B
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (car == null) return null;
+
+            // За edit полето ImageUrl ще показваме главната снимка от CarImages (ако има),
+            // иначе fallback към старото car.ImageUrl
+            var mainImg =
+                car.Images?
+                    .OrderByDescending(i => i.IsMain)
+                    .ThenBy(i => i.SortOrder)
+                    .FirstOrDefault()?.Url
+                ?? car.ImageUrl;
 
             return new CarEditViewModel
             {
@@ -95,14 +125,19 @@ namespace AutoMarket.Services
                 FuelType = car.FuelType,
                 Transmission = car.Transmission,
                 Description = car.Description,
-                ImageUrl = car.ImageUrl
+                ImageUrl = mainImg
             };
         }
 
         public async Task<bool> UpdateAsync(int id, CarEditViewModel model)
         {
-            var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
+            var car = await context.Cars
+                .Include(c => c.Images) // ✅ Variant B (трябва за update на снимката)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (car == null) return false;
+
+            var imageUrl = (model.ImageUrl ?? "").Trim();
 
             car.Year = model.Year;
             car.Price = model.Price;
@@ -112,7 +147,33 @@ namespace AutoMarket.Services
             car.FuelType = model.FuelType;
             car.Transmission = model.Transmission;
             car.Description = model.Description ?? "";
-            car.ImageUrl = model.ImageUrl ?? "";
+
+            // оставяме го за съвместимост
+            car.ImageUrl = imageUrl;
+
+            // ✅ Variant B: обновяваме главната снимка
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+            {
+                var main = car.Images
+                    .OrderByDescending(i => i.IsMain)
+                    .ThenBy(i => i.SortOrder)
+                    .FirstOrDefault(i => i.IsMain);
+
+                if (main == null)
+                {
+                    // няма главна - създаваме
+                    car.Images.Add(new CarImage
+                    {
+                        Url = imageUrl,
+                        IsMain = true,
+                        SortOrder = 0
+                    });
+                }
+                else
+                {
+                    main.Url = imageUrl;
+                }
+            }
 
             await context.SaveChangesAsync();
             return true;
@@ -163,7 +224,9 @@ namespace AutoMarket.Services
         {
             var q = context.Cars
                 .AsNoTracking()
-                .Include(c => c.CarModel).ThenInclude(cm => cm.Make)
+                .Include(c => c.Images) // ✅ Variant B (за главната снимка в листинга)
+                .Include(c => c.CarModel)
+                    .ThenInclude(cm => cm.Make)
                 .AsQueryable();
 
             if (query.MakeId.HasValue && query.MakeId.Value > 0)
