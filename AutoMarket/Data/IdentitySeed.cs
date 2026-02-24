@@ -32,9 +32,21 @@ namespace AutoMarket.Data
                 }
             }
 
-            await EnsureUserWithRole(userManager, logger, "admin@automarket.bg", "Admin123!", "Admin");
-            // По желание тест клиент:
-             await EnsureUserWithRole(userManager, logger, "client@automarket.bg", "Client123!", "Client");
+            await EnsureUserWithRole(
+                userManager,
+                logger,
+                "admin@automarket.bg",
+                "Admin123!",
+                "Admin",
+                "+359888111111");
+
+            await EnsureUserWithRole(
+                userManager,
+                logger,
+                "client@automarket.bg",
+                "Client123!",
+                "Client",
+                "+359888222222");
         }
 
         private static async Task EnsureUserWithRole(
@@ -42,7 +54,8 @@ namespace AutoMarket.Data
             ILogger? logger,
             string email,
             string password,
-            string role)
+            string role,
+            string phoneNumber)
         {
             var user = await userManager.FindByEmailAsync(email);
 
@@ -52,7 +65,8 @@ namespace AutoMarket.Data
                 {
                     UserName = email,
                     Email = email,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    PhoneNumber = phoneNumber
                 };
 
                 var createResult = await userManager.CreateAsync(user, password);
@@ -60,7 +74,16 @@ namespace AutoMarket.Data
                 {
                     var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
                     logger?.LogError("Failed to create user {Email}: {Errors}", email, errors);
-                    return; // важно: не спираме приложението
+                    return;
+                }
+            }
+            else
+            {
+                // Ако вече съществува, но няма телефон — добавяме
+                if (string.IsNullOrWhiteSpace(user.PhoneNumber))
+                {
+                    user.PhoneNumber = phoneNumber;
+                    await userManager.UpdateAsync(user);
                 }
             }
 
@@ -76,4 +99,3 @@ namespace AutoMarket.Data
         }
     }
 }
-

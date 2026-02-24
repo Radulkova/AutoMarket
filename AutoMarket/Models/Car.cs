@@ -1,5 +1,7 @@
 ﻿using AutoMarket.Models;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace AutoMarket.Models
 {
@@ -42,6 +44,7 @@ namespace AutoMarket.Models
         [Required]
         public string SellerId { get; set; } = null!;
 
+        public IdentityUser Seller { get; set; } = null!;
         public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMarket.Data;
 using AutoMarket.Models;
 using AutoMarket.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ namespace AutoMarket.Services
             return await context.Cars
                 .AsNoTracking()
                 .Include(c => c.Images) // ✅ Variant B
+                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
                 .OrderByDescending(c => c.Id)
@@ -31,6 +33,7 @@ namespace AutoMarket.Services
             return await context.Cars
                 .AsNoTracking()
                 .Include(c => c.Images) // ✅ Variant B (за галерия/главна снимка)
+                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
                 .FirstOrDefaultAsync(c => c.Id == id);
@@ -225,6 +228,7 @@ namespace AutoMarket.Services
             var q = context.Cars
                 .AsNoTracking()
                 .Include(c => c.Images) // ✅ Variant B (за главната снимка в листинга)
+                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
                 .AsQueryable();

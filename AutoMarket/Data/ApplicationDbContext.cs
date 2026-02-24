@@ -1,5 +1,6 @@
 ﻿using AutoMarket.Models;
 using AutoMarket.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,6 +46,13 @@ namespace AutoMarket.Data
                 .Property(ci => ci.Url)
                 .IsRequired()
                 .HasMaxLength(500);
+            
+            builder.Entity<Car>()
+               .HasOne<IdentityUser>(c => c.Seller)
+               .WithMany()
+               .HasForeignKey(c => c.SellerId)
+               .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

@@ -83,6 +83,11 @@
                 <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
                     <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">← Назад към обявите</a>
 
+                    <button type="button" class="pd-btn pd-btn-primary"
+                            data-bs-toggle="modal" data-bs-target="#contactSellerModal">
+                        Свържи се с продавача
+                    </button>
+
                     @if (User.IsInRole("Admin"))
                     {
                         <a class="pd-btn" asp-controller="Cars" asp-action="Edit" asp-route-id="@Model.Id">Редактирай</a>
@@ -121,6 +126,129 @@
                         </form>
                     </div>
                 }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pd-surface" style="padding:14px;">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.10);">
+                <h5 class="modal-title" style="color:rgba(255,255,255,.92); font-weight:800;">
+                    Свържи се с продавача
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Затвори"></button>
+            </div>
+
+            <div class="modal-body" style="color:rgba(255,255,255,.82);">
+                <div style="margin-bottom:10px; color:rgba(255,255,255,.65); font-size:14px;">
+                    Относно обявата:
+                    <b style="color:rgba(255,255,255,.90);">@Model.CarModel.Make.Name @Model.CarModel.Name</b>
+                    (@Model.Year)
+                </div>
+
+                <div class="pd-surface" style="padding:12px; box-shadow:none;">
+                    <div style="display:grid; gap:10px;">
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Продавач</div>
+                            <div style="font-weight:750;">@Model.SellerId</div>
+                        </div>
+
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Телефон</div>
+                            <div style="font-weight:750;">+359 88 123 4567</div>
+                        </div>
+
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Имейл</div>
+                            <div style="font-weight:750;">seller@automarket.bg</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <a class="pd-btn pd-btn-primary" href="tel:+359881234567">
+                        Обади се
+                    </a>
+                    <a class="pd-btn" href="mailto:seller@automarket.bg?subject=Запитване%20за%20автомобил&body=Здравейте,%0AИнтересувам%20се%20от%20обявата:%20@Model.CarModel.Make.Name%20@Model.CarModel.Name%20(@Model.Year).">
+                        Изпрати имейл
+                    </a>
+                    <button type="button" class="pd-btn" data-bs-dismiss="modal">Затвори</button>
+                </div>
+
+                <div style="margin-top:10px; color:rgba(255,255,255,.55); font-size:12px;">
+                    Съвет: не изпращай лични данни на непознати. Уговаряй оглед на безопасно място.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var sellerName = Model.Seller?.UserName ?? "Продавач";
+    var sellerEmail = Model.Seller?.Email;
+    var sellerPhone = Model.Seller?.PhoneNumber;
+}
+
+<div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content pd-surface" style="padding:14px;">
+            <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.10);">
+                <h5 class="modal-title" style="color:rgba(255,255,255,.92); font-weight:800;">
+                    Свържи се с продавача
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Затвори"></button>
+            </div>
+
+            <div class="modal-body" style="color:rgba(255,255,255,.82);">
+                <div style="margin-bottom:10px; color:rgba(255,255,255,.65); font-size:14px;">
+                    Относно обявата:
+                    <b style="color:rgba(255,255,255,.90);">@Model.CarModel.Make.Name @Model.CarModel.Name</b>
+                    (@Model.Year)
+                </div>
+
+                <div class="pd-surface" style="padding:12px; box-shadow:none;">
+                    <div style="display:grid; gap:10px;">
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Продавач</div>
+                            <div style="font-weight:750;">@sellerName</div>
+                        </div>
+
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Телефон</div>
+                            <div style="font-weight:750;">
+                                @(string.IsNullOrWhiteSpace(sellerPhone) ? "Няма добавен телефон" : sellerPhone)
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Имейл</div>
+                            <div style="font-weight:750;">
+                                @(string.IsNullOrWhiteSpace(sellerEmail) ? "Няма добавен имейл" : sellerEmail)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+                    @if (!string.IsNullOrWhiteSpace(sellerPhone))
+                    {
+                        <a class="pd-btn pd-btn-primary" href="tel:@sellerPhone">Обади се</a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(sellerEmail))
+                    {
+                        <a class="pd-btn"
+                           href="mailto:@sellerEmail?subject=Запитване%20за%20автомобил&body=Здравейте,%0AИнтересувам%20се%20от%20обявата:%20@Model.CarModel.Make.Name%20@Model.CarModel.Name%20(@Model.Year).">
+                            Изпрати имейл
+                        </a>
+                    }
+                    <button type="button" class="pd-btn" data-bs-dismiss="modal">Затвори</button>
+                </div>
+
+                <div style="margin-top:10px; color:rgba(255,255,255,.55); font-size:12px;">
+                    Съвет: уговаряй оглед на безопасно място и не изпращай чувствителни данни.
+                </div>
             </div>
         </div>
     </div>
