@@ -32,7 +32,7 @@ namespace AutoMarket.Data
             var makes = new[]
             {
                 "Audi","BMW","Mercedes-Benz","Volkswagen","Toyota","Honda","Ford","Hyundai","Kia","Skoda",
-                "Peugeot","Renault","Opel","Mazda","Nissan"
+                "Peugeot","Renault","Opel","Mazda","Nissan","Mini"
             };
 
             foreach (var m in makes)
@@ -98,30 +98,48 @@ namespace AutoMarket.Data
             var cars = new List<Car>
             {
                 // Audi
-                CreateCar(await EnsureModel("Audi","A4"), 2019, 52000, 98000, 1968, 190, "Дизел", "Автоматична",
+                CreateCar(await EnsureModel("Audi","A4"), 2019, 52000, 98500, 1968, 190, "Дизел", "Автоматична",
                     "Audi A4 2.0 TDI, обслужена, реални км.", "/img/cars/audi-a4.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Audi","A6"), 2020, 78000, 72000, 1984, 245, "Бензин", "Автоматична",
+               CreateCar(await EnsureModel("Audi","A4"), 2024, 68999, 44200, 2000, 265, "Бензин", "Автоматична",
+                    "Audi A4 ,нов внос , реални км.", "/img/cars/audi-a7.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Audi","A6"), 2020, 78900, 72000, 1984, 245, "Бензин", "Автоматична",
                     "Audi A6, Quattro, много запазена.", "/img/cars/audi-a6.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Audi","Q5"), 2018, 69000, 110000, 1968, 190, "Дизел", "Автоматична",
+                CreateCar(await EnsureModel("Audi","A7"), 2021, 72100, 85300, 1984, 245, "Дизел", "Автоматична",
+                    "Audi A7, седан, 4/5 врати.", "/img/cars/audi-a7.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Audi","Q5"), 2018, 69300, 110000, 1968, 190, "Дизел", "Автоматична",
                     "Audi Q5, 4x4, отлична за семейство.", "/img/cars/audi-q5.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Audi","Q7"), 2017, 88000, 145000, 2967, 272, "Дизел", "Автоматична",
+                CreateCar(await EnsureModel("Audi","Q7"), 2017, 88900, 145000, 2967, 272, "Дизел", "Автоматична",
                     "Audi Q7, 7 места, голяма и удобна.", "/img/cars/audi-q7.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Audi","A3"), 2021, 46000, 54000, 1498, 150, "Бензин", "Ръчна",
                     "Audi A3, икономична и пъргава.", "/img/cars/audi-a3.jpg", admin.Id),
 
+                CreateCar(await EnsureModel("Audi","A3"), 2015, 22900, 157000, 1498, 150, "Дизел", "Ръчна",
+                    "Audi A3, икономична ,идеална за града.", "/img/cars/audi-a31.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Audi","Rs7"), 2013, 106000, 36000, 1498, 150, "Бензин", "Автоматична",
+                    "Audi Rs7, спортна , седан.", "/img/cars/audi-rs7.jpg", admin.Id),
+
                 // BMW
-                CreateCar(await EnsureModel("BMW","3 Series"), 2019, 61000, 89000, 1998, 184, "Бензин", "Автоматична",
+                CreateCar(await EnsureModel("BMW","3 Series"), 2019, 61000, 89090, 1998, 184, "Бензин", "Автоматична",
                     "BMW 3 Series, спортен пакет, без забележки.", "/img/cars/bmw-3-series.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("BMW","3 Series"), 2012, 11800, 174090, 2000, 140, "Дизел", "Автоматична",
+                    "BMW 3 Series, без забележки ,много екстри.", "/img/cars/bmw-31-series.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("BMW","5 Series"), 2018, 72000, 125000, 1995, 190, "Дизел", "Автоматична",
                     "BMW 5 Series, комфорт и динамика.", "/img/cars/bmw-5-series.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("BMW","X5"), 2017, 79000, 158000, 2993, 258, "Дизел", "Автоматична",
                     "BMW X5, 4x4, обслужен.", "/img/cars/bmw-x5.jpg", admin.Id),
+
+               CreateCar(await EnsureModel("BMW","X5"), 2025, 158900, 36100, 2993, 340, "Дизел", "Автоматична",
+                    "BMW X5 Premium Selection,пълен комплект екстри.", "/img/cars/bmw-x51.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("BMW","X3"), 2020, 83000, 68000, 1995, 190, "Дизел", "Автоматична",
                     "BMW X3, xDrive, отлична визия.", "/img/cars/bmw-x3.jpg", admin.Id),
@@ -136,8 +154,11 @@ namespace AutoMarket.Data
                     "BMW X6, запазена и модерна.", "/img/cars/bmw-x6.jpg", admin.Id),
 
                 // Mercedes-Benz
-                CreateCar(await EnsureModel("Mercedes-Benz","C-Class"), 2019, 69000, 99000, 1950, 194, "Дизел", "Автоматична",
+                CreateCar(await EnsureModel("Mercedes-Benz","C-Class"), 2019, 69800, 99000, 1950, 194, "Дизел", "Автоматична",
                     "C-Class, AMG line, топ състояние.", "/img/cars/mercedes-benz-c-class.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Mercedes-Benz","C-Class"), 2008, 20800, 11990, 1950, 170, "Дизел", "Ръчна",
+                    "C-Class, изключително запазена, кожен салон.", "/img/cars/mercedes-benz-c-class1.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Mercedes-Benz","E-Class"), 2018, 99000, 110000, 1950, 194, "Дизел", "Автоматична",
                     "E-Class, много екстри, комфорт.", "/img/cars/mercedes-benz-e-class.jpg", admin.Id),
@@ -151,7 +172,7 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("Mercedes-Benz","A-Class"), 2021, 56000, 42000, 1332, 163, "Бензин", "Автоматична",
                     "A-Class, много запазена, перфектна за град.", "/img/cars/mercedes-benz-a-class.jpg", admin.Id),
 
-               CreateCar(await EnsureModel("Mercedes-Benz","GLA"), 2017, 28000, 97000,  2200, 177, "Дизел", "Автоматична",
+               CreateCar(await EnsureModel("Mercedes-Benz","GLA"), 2017, 28200, 97000,  2200, 177, "Дизел", "Автоматична",
                     "GLA, Без забележки, идеална за град.", "/img/cars/mercedes-benz-GLA.jpg", admin.Id),
                 
                 CreateCar(await EnsureModel("Mercedes-Benz","CLA"), 2019, 20000, 104000,  2200, 177, "Дизел", "Автоматична",
@@ -161,10 +182,16 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("Volkswagen","Passat"), 2019, 45000, 89000, 1968, 150, "Дизел", "Автоматична",
                     "Passat, икономичен и просторен.", "/img/cars/volkswagen-passat.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Volkswagen","Golf"), 2020, 39000, 72000, 1498, 150, "Бензин", "Ръчна",
-                    "Golf, перфектен за всеки ден.", "/img/cars/volkswagen-golf.jpg", admin.Id),
+                CreateCar(await EnsureModel("Volkswagen","Golf"), 2020, 19000, 72000, 1498, 150, "Бензин", "Ръчна",
+                    "Golf 5, перфектен за всеки ден.", "/img/cars/volkswagen-golf.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Volkswagen","Tiguan"), 2018, 52000, 123000, 1968, 190, "Дизел", "Автоматична",
+                CreateCar(await EnsureModel("Volkswagen","Golf"), 2021, 35900, 99000, 1998, 116, "Бензин", "Ръчна",
+                    "Golf 7, спортен пакет.", "/img/cars/volkswagen-golf1.jpg", admin.Id),
+
+                 CreateCar(await EnsureModel("Volkswagen","Golf"), 1985, 5799, 290700, 1998, 54, "Дизел", "Ръчна",
+                    "Golf 2, добре запазена.", "/img/cars/volkswagen-golf2.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Volkswagen","Tiguan"), 2018, 52300, 123000, 1968, 190, "Дизел", "Автоматична",
                     "Tiguan, висок клас, удобно SUV.", "/img/cars/volkswagen-tiguan.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Volkswagen","Touareg"), 2017, 79000, 170000, 2967, 262, "Дизел", "Автоматична",
@@ -176,6 +203,9 @@ namespace AutoMarket.Data
                 // Toyota
                 CreateCar(await EnsureModel("Toyota","Corolla"), 2020, 42000, 54000, 1798, 122, "Хибрид", "Автоматична",
                     "Corolla Hybrid, супер разход.", "/img/cars/toyota-corolla.jpg", admin.Id),
+
+                CreateCar(await EnsureModel("Toyota","Corolla"), 2008, 7688, 198000, 1600, 124, "Бензин", "Ръчна",
+                    "Corolla , в добро състояние.", "/img/cars/toyota-corolla1.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Toyota","RAV4"), 2020, 72000, 47000, 2487, 222, "Хибрид", "Автоматична",
                     "RAV4 Hybrid, 4x4.", "/img/cars/toyota-rav4.jpg", admin.Id),
@@ -193,6 +223,9 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("Honda","Civic"), 2018, 19000, 128000, 1597, 120, "Бензин", "Ръчна",
                     "Civic, надеждна и икономична.", "/img/cars/honda-civic.jpg", admin.Id),
 
+                 CreateCar(await EnsureModel("Honda","Civic"), 2006, 6300, 271000, 2200, 140, "Бензин", "Ръчна",
+                    "Civic, икономична и запазена.", "/img/cars/honda-civic1.jpg", admin.Id),
+
                 CreateCar(await EnsureModel("Honda","Accord"), 2017, 26000, 145000, 1997, 155, "Бензин", "Автоматична",
                     "Accord, простор и комфорт.", "/img/cars/honda-accord.jpg", admin.Id),
 
@@ -202,12 +235,15 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("Honda","Jazz"), 2020, 22000, 64000, 1318, 102, "Бензин", "Ръчна",
                     "Jazz, практична за града.", "/img/cars/honda-jazz.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Honda","HR-V"), 2021, 41000, 39000, 1498, 130, "Бензин", "Автоматична",
+                CreateCar(await EnsureModel("Honda","HR-V"), 2021, 41000, 39070, 1498, 130, "Бензин", "Автоматична",
                     "HR-V, компактно SUV.", "/img/cars/honda-hr-v.jpg", admin.Id),
 
                 // Ford
                 CreateCar(await EnsureModel("Ford","Mustang"), 2021, 99000, 32000, 5000, 450, "Бензин", "Автоматична",
                     "Mustang 5.0 V8, звук и емоция.", "/img/cars/ford-mustang.jpg", admin.Id),
+                
+                CreateCar(await EnsureModel("Ford","Mustang"), 2005, 22200, 32000, 4600, 305, "Бензин", "Автоматична",
+                    "Mustang  GT, 4. 6 V8, за истински ценители.", "/img/cars/ford-mustang1.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Ford","Focus"), 2019, 24000, 98000, 1498, 150, "Бензин", "Ръчна",
                     "Focus, икономичен хечбек.", "/img/cars/ford-focus.jpg", admin.Id),
@@ -215,11 +251,26 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("Ford","Kuga"), 2018, 35000, 124000, 1997, 150, "Дизел", "Автоматична",
                     "Kuga, удобен SUV.", "/img/cars/ford-kuga.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("Ford","Fiesta"), 2020, 18500, 52000, 998, 100, "Бензин", "Ръчна",
+                CreateCar(await EnsureModel("Ford","Fiesta"), 2020, 18500, 52600, 998, 100, "Бензин", "Ръчна",
                     "Fiesta, супер за град.", "/img/cars/ford-fiesta.jpg", admin.Id),
 
                 CreateCar(await EnsureModel("Ford","Ranger"), 2017, 59000, 160000, 3198, 200, "Дизел", "Автоматична",
                     "Ranger, пикап за работа и офроуд.", "/img/cars/ford-ranger.jpg", admin.Id),
+
+                //Mini Cooper
+                
+                CreateCar(await EnsureModel("Mini","Countryman"), 2011, 13000, 160000, 1998, 184, "Бензин", "Автоматична",
+                    "Countryman, 4x4,има подгрев", "/img/cars/mini-countryman.jpg", admin.Id),
+
+                 CreateCar(await EnsureModel("Mini","Cooper"), 2019, 18100, 89000, 1500, 136, "Бензин", "Ръчна",
+                    "Cooper, икономичнарстава за градско каране", "/img/cars/mini-coopeer.jpg", admin.Id),
+
+                  CreateCar(await EnsureModel("Mini","Cooper"), 2006, 7040, 176000, 1600, 120, "Бензин", "Ръчна",
+                    "Cooper, в добро състояние", "/img/cars/mini-cooper1.jpg", admin.Id),
+
+                 CreateCar(await EnsureModel("Mini","Cooper"), 2005, 7300, 195000, 1600, 116, "Бензин", "Ръчна",
+                    "Cooper, без забележки", "/img/cars/mini-coopeer2.jpg", admin.Id),
+
             };
 
           
