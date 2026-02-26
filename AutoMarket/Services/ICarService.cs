@@ -20,5 +20,7 @@ namespace AutoMarket.Services
         Task<List<(int id, string name)>> GetModelsAsync(int? makeId);
 
         Task<(IEnumerable<Car> cars, int totalCount)> SearchAsync(CarsQueryViewModel query);
+
+        Task<List<Car>> GetLatestAsync(int take = 6);
     }
 }

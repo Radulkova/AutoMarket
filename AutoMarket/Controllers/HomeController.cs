@@ -1,25 +1,28 @@
-using System.Diagnostics;
-using AutoMarket.Models;
+using AutoMarket.Services;
+using AutoMarket.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace AutoMarket.Controllers
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ICarService carService;
+
+    public HomeController(ICarService carService)
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        this.carService = carService;
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var makes = await carService.GetMakesAsync();
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        var vm = new HomeViewModel
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+            Makes = makes.Select(m => new SelectListItem(m.name, m.id.ToString())).ToList(),
+            LatestCars = await carService.GetLatestAsync(6)
+        };
+
+        return View(vm);
     }
 }

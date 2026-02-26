@@ -275,5 +275,16 @@ namespace AutoMarket.Services
             var cars = await q.Skip(skip).Take(pageSize).ToListAsync();
             return (cars, total);
         }
+
+        public async Task<List<Car>> GetLatestAsync(int take = 6)
+        {
+            return await context.Cars
+                .AsNoTracking()
+                .Include(c => c.Images)
+                .Include(c => c.CarModel).ThenInclude(cm => cm.Make)
+                .OrderByDescending(c => c.Id)
+                .Take(take)
+                .ToListAsync();
+        }
     }
 }

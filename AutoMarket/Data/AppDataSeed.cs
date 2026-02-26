@@ -126,8 +126,14 @@ namespace AutoMarket.Data
                 CreateCar(await EnsureModel("BMW","X3"), 2020, 83000, 68000, 1995, 190, "Дизел", "Автоматична",
                     "BMW X3, xDrive, отлична визия.", "/img/cars/bmw-x3.jpg", admin.Id),
 
-                CreateCar(await EnsureModel("BMW","1 Series"), 2021, 42000, 41000, 1499, 140, "Бензин", "Автоматична",
+                CreateCar(await EnsureModel("BMW","2 Series"), 2022, 57000, 46000, 1599, 204, "Бензин", "Автоматична",
+                    "BMW 2 Series, спортна и модерна.", "/img/cars/bmw-2-gran-coupe.jpg", admin.Id),
+
+                 CreateCar(await EnsureModel("BMW","1 Series"), 2021, 42000, 41000, 1499, 140, "Бензин", "Автоматична",
                     "BMW 1 Series, градска и модерна.", "/img/cars/bmw-1-series.jpg", admin.Id),
+
+                 CreateCar(await EnsureModel("BMW","X6"), 2022, 128000, 122000, 3000, 300, "Бензин", "Автоматична",
+                    "BMW X6, запазена и модерна.", "/img/cars/bmw-x6.jpg", admin.Id),
 
                 // Mercedes-Benz
                 CreateCar(await EnsureModel("Mercedes-Benz","C-Class"), 2019, 69000, 99000, 1950, 194, "Дизел", "Автоматична",
@@ -144,6 +150,12 @@ namespace AutoMarket.Data
 
                 CreateCar(await EnsureModel("Mercedes-Benz","A-Class"), 2021, 56000, 42000, 1332, 163, "Бензин", "Автоматична",
                     "A-Class, много запазена, перфектна за град.", "/img/cars/mercedes-benz-a-class.jpg", admin.Id),
+
+               CreateCar(await EnsureModel("Mercedes-Benz","GLA"), 2017, 28000, 97000,  2200, 177, "Дизел", "Автоматична",
+                    "GLA, Без забележки, идеална за град.", "/img/cars/mercedes-benz-GLA.jpg", admin.Id),
+                
+                CreateCar(await EnsureModel("Mercedes-Benz","CLA"), 2019, 20000, 104000,  2200, 177, "Дизел", "Автоматична",
+                    "CLA, Пълен комплект екстри, супер състояние.", "/img/cars/mercedes-benz-CLA.jpg", admin.Id),
 
                 // VW
                 CreateCar(await EnsureModel("Volkswagen","Passat"), 2019, 45000, 89000, 1968, 150, "Дизел", "Автоматична",
@@ -210,39 +222,7 @@ namespace AutoMarket.Data
                     "Ranger, пикап за работа и офроуд.", "/img/cars/ford-ranger.jpg", admin.Id),
             };
 
-            // Гарантираме минимум 50 обяви
-            var rnd = new Random(42);
-            while (cars.Count < 50)
-            {
-                var baseCar = cars[rnd.Next(cars.Count)];
-
-                var clone = new Car
-                {
-                    CarModelId = baseCar.CarModelId,
-                    Year = Math.Max(2005, Math.Min(2024, baseCar.Year + rnd.Next(-3, 4))),
-                    Price = Math.Max(3000, baseCar.Price + rnd.Next(-5000, 7000)),
-                    MileageKm = Math.Max(1000, baseCar.MileageKm + rnd.Next(-20000, 30000)),
-                    EngineCapacityCc = baseCar.EngineCapacityCc,
-                    HorsePower = baseCar.HorsePower,
-                    FuelType = baseCar.FuelType,
-                    Transmission = baseCar.Transmission,
-                    Description = baseCar.Description,
-                    SellerId = admin.Id
-                };
-
-                // копираме снимките (НО като нови записи, не същите обекти!)
-                foreach (var img in baseCar.Images.OrderBy(i => i.SortOrder))
-                {
-                    clone.Images.Add(new CarImage
-                    {
-                        Url = img.Url,
-                        IsMain = img.IsMain,
-                        SortOrder = img.SortOrder
-                    });
-                }
-
-                cars.Add(clone);
-            }
+          
 
             db.Cars.AddRange(cars);
             await db.SaveChangesAsync();

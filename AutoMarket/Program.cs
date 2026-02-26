@@ -1,6 +1,7 @@
 using AutoMarket.Data;
 using AutoMarket.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICarModelService, CarModelService>();
 
+
+builder.Services.AddSingleton<IEmailSender, AutoMarket.Services.NoOpEmailSender>();
 
 var app = builder.Build();
 
