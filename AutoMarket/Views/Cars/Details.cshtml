@@ -16,6 +16,10 @@
         .OrderByDescending(i => i.IsMain)
         .ThenBy(i => i.SortOrder)
         .ToList();
+
+    var sellerName = Model.Seller?.UserName ?? "Продавач";
+    var sellerEmail = Model.Seller?.Email;
+    var sellerPhone = Model.Seller?.PhoneNumber;
 }
 
 <div class="pd-container">
@@ -27,6 +31,13 @@
             @Model.Year • @Model.MileageKm.ToString("N0") км • @Model.FuelType • @Model.Transmission
         </p>
     </div>
+
+    @if (Model.IsSold)
+    {
+        <div class="alert alert-danger" style="border-radius:14px;">
+            Продаден автомобил
+        </div>
+    }
 
     <div class="pd-grid" style="align-items:start;">
 
@@ -68,7 +79,7 @@
             <div class="pd-surface" style="padding:16px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
                     <div style="color:rgba(255,255,255,.7); font-size:14px;">Цена</div>
-                    <div class="pd-price" style="margin:0;">@Model.Price.ToString("N0") лв.</div>
+                    <div class="pd-price" style="margin:0;">@Model.Price.ToString("N0") €</div>
                 </div>
 
                 <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
@@ -78,6 +89,35 @@
                     <span class="pd-badge">Скорости: <b style="color:rgba(255,255,255,.9)">@Model.Transmission</b></span>
                     <span class="pd-badge">Двигател: <b style="color:rgba(255,255,255,.9)">@Model.EngineCapacityCc cc</b></span>
                     <span class="pd-badge">Мощност: <b style="color:rgba(255,255,255,.9)">@Model.HorsePower hp</b></span>
+                </div>
+
+                <!-- RESERVE VIEWING (opens modal) -->
+                <div style="margin-top:14px;">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        if (!Model.IsSold)
+                        {
+                            <button type="button"
+                                    class="btn btn-warning w-100"
+                                    style="border-radius:12px;"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reserveViewingModal">
+                                Резервирай оглед
+                            </button>
+                        }
+                        else
+                        {
+                            <div style="margin-top:8px; color:rgba(255,255,255,.75); font-size:14px;">
+                                Не може да резервирате оглед — автомобилът е продаден.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p style="margin:0;">
+                            <a asp-area="Identity" asp-page="/Account/Login">Влез</a>, за да резервираш оглед.
+                        </p>
+                    }
                 </div>
 
                 <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
@@ -131,66 +171,66 @@
     </div>
 </div>
 
-<div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
+<!-- RESERVE VIEWING MODAL -->
+<div class="modal fade" id="reserveViewingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pd-surface" style="padding:14px;">
             <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.10);">
                 <h5 class="modal-title" style="color:rgba(255,255,255,.92); font-weight:800;">
-                    Свържи се с продавача
+                    Резервирай оглед
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Затвори"></button>
             </div>
 
-            <div class="modal-body" style="color:rgba(255,255,255,.82);">
-                <div style="margin-bottom:10px; color:rgba(255,255,255,.65); font-size:14px;">
-                    Относно обявата:
-                    <b style="color:rgba(255,255,255,.90);">@Model.CarModel.Make.Name @Model.CarModel.Name</b>
-                    (@Model.Year)
-                </div>
+            <form asp-controller="Orders" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="CarId" value="@Model.Id" />
 
-                <div class="pd-surface" style="padding:12px; box-shadow:none;">
-                    <div style="display:grid; gap:10px;">
-                        <div>
-                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Продавач</div>
-                            <div style="font-weight:750;">@Model.SellerId</div>
-                        </div>
+                <div class="modal-body" style="color:rgba(255,255,255,.82);">
+                    <div style="margin-bottom:10px; color:rgba(255,255,255,.65); font-size:14px;">
+                        Обява:
+                        <b style="color:rgba(255,255,255,.90);">@Model.CarModel.Make.Name @Model.CarModel.Name</b>
+                        (@Model.Year)
+                    </div>
 
-                        <div>
-                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Телефон</div>
-                            <div style="font-weight:750;">+359 88 123 4567</div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Име</label>
+                        <input class="form-control" name="FirstName" />
+                    </div>
 
-                        <div>
-                            <div style="color:rgba(255,255,255,.60); font-size:13px;">Имейл</div>
-                            <div style="font-weight:750;">seller@automarket.bg</div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Фамилия</label>
+                        <input class="form-control" name="LastName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Телефон</label>
+                        <input class="form-control" name="Phone" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Бележка (по желание)</label>
+                        <textarea class="form-control" name="Note" rows="3"></textarea>
+                    </div>
+
+                    <div style="margin-top:8px; color:rgba(255,255,255,.60); font-size:12px;">
+                        Данните се използват само за връзка с теб относно огледа.
                     </div>
                 </div>
 
-                <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <a class="pd-btn pd-btn-primary" href="tel:+359881234567">
-                        Обади се
-                    </a>
-                    <a class="pd-btn" href="mailto:seller@automarket.bg?subject=Запитване%20за%20автомобил&body=Здравейте,%0AИнтересувам%20се%20от%20обявата:%20@Model.CarModel.Make.Name%20@Model.CarModel.Name%20(@Model.Year).">
-                        Изпрати имейл
-                    </a>
-                    <button type="button" class="pd-btn" data-bs-dismiss="modal">Затвори</button>
+                <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.10);">
+                    <button type="button" class="pd-btn" data-bs-dismiss="modal">Отказ</button>
+                    <button type="submit" class="btn btn-warning" style="border-radius:12px;">
+                        Потвърди резервацията
+                    </button>
                 </div>
+            </form>
 
-                <div style="margin-top:10px; color:rgba(255,255,255,.55); font-size:12px;">
-                    Съвет: не изпращай лични данни на непознати. Уговаряй оглед на безопасно място.
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
-@{
-    var sellerName = Model.Seller?.UserName ?? "Продавач";
-    var sellerEmail = Model.Seller?.Email;
-    var sellerPhone = Model.Seller?.PhoneNumber;
-}
-
+<!-- CONTACT SELLER MODAL -->
 <div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pd-surface" style="padding:14px;">

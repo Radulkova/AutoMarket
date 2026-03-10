@@ -1,7 +1,6 @@
 ﻿using AutoMarket.Data;
 using AutoMarket.Models;
 using AutoMarket.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +19,9 @@ namespace AutoMarket.Services
         {
             return await context.Cars
                 .AsNoTracking()
-                .Include(c => c.Images) // ✅ Variant B
-                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
+                .Where(c => !c.IsDeleted && !c.IsSold) // ✅ NEW
+                .Include(c => c.Images)
+                .Include(c => c.Seller)
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
                 .OrderByDescending(c => c.Id)
@@ -30,13 +30,16 @@ namespace AutoMarket.Services
 
         public async Task<Car?> GetByIdAsync(int id)
         {
+            // ✅ NEW: hide deleted only; sold cars still visible in Details
+            // If you want to hide sold too -> add: && !c.IsSold
             return await context.Cars
                 .AsNoTracking()
-                .Include(c => c.Images) // ✅ Variant B (за галерия/главна снимка)
-                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
+                .Where(c => c.Id == id && !c.IsDeleted)
+                .Include(c => c.Images)
+                .Include(c => c.Seller)
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync();
         }
 
         // --------------------------
@@ -77,11 +80,15 @@ namespace AutoMarket.Services
                 Description = model.Description ?? "",
                 SellerId = sellerId,
 
-                // оставяме го за съвместимост (ако някъде още го ползваш)
+                // ✅ NEW: defaults (explicit, for clarity)
+                IsDeleted = false,
+                IsSold = false,
+
+                // legacy compatibility
                 ImageUrl = imageUrl
             };
 
-            // ✅ Variant B: ако има URL, правим го главна снимка в CarImages
+            // ✅ Variant B: if URL -> store as main image in CarImages
             if (!string.IsNullOrWhiteSpace(imageUrl))
             {
                 car.Images.Add(new CarImage
@@ -104,13 +111,11 @@ namespace AutoMarket.Services
         {
             var car = await context.Cars
                 .AsNoTracking()
-                .Include(c => c.Images) // ✅ Variant B
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted); // ✅ NEW
 
             if (car == null) return null;
 
-            // За edit полето ImageUrl ще показваме главната снимка от CarImages (ако има),
-            // иначе fallback към старото car.ImageUrl
             var mainImg =
                 car.Images?
                     .OrderByDescending(i => i.IsMain)
@@ -135,8 +140,8 @@ namespace AutoMarket.Services
         public async Task<bool> UpdateAsync(int id, CarEditViewModel model)
         {
             var car = await context.Cars
-                .Include(c => c.Images) // ✅ Variant B (трябва за update на снимката)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted); // ✅ NEW
 
             if (car == null) return false;
 
@@ -151,10 +156,10 @@ namespace AutoMarket.Services
             car.Transmission = model.Transmission;
             car.Description = model.Description ?? "";
 
-            // оставяме го за съвместимост
+            // legacy compatibility
             car.ImageUrl = imageUrl;
 
-            // ✅ Variant B: обновяваме главната снимка
+            // ✅ Variant B: update main image
             if (!string.IsNullOrWhiteSpace(imageUrl))
             {
                 var main = car.Images
@@ -164,7 +169,6 @@ namespace AutoMarket.Services
 
                 if (main == null)
                 {
-                    // няма главна - създаваме
                     car.Images.Add(new CarImage
                     {
                         Url = imageUrl,
@@ -183,14 +187,16 @@ namespace AutoMarket.Services
         }
 
         // --------------------------
-        // DELETE
+        // DELETE (Soft Delete)
         // --------------------------
         public async Task<bool> DeleteAsync(int id)
         {
             var car = await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
             if (car == null) return false;
 
-            context.Cars.Remove(car);
+            // ✅ NEW: soft delete
+            car.IsDeleted = true;
+
             await context.SaveChangesAsync();
             return true;
         }
@@ -227,11 +233,14 @@ namespace AutoMarket.Services
         {
             var q = context.Cars
                 .AsNoTracking()
-                .Include(c => c.Images) // ✅ Variant B (за главната снимка в листинга)
-                .Include(c => c.Seller) // ✅ Professional: контакти от Identity
+                .Include(c => c.Images)
+                .Include(c => c.Seller)
                 .Include(c => c.CarModel)
                     .ThenInclude(cm => cm.Make)
                 .AsQueryable();
+
+            // ✅ NEW: hide deleted/sold in all search results
+            q = q.Where(c => !c.IsDeleted && !c.IsSold);
 
             if (query.MakeId.HasValue && query.MakeId.Value > 0)
                 q = q.Where(c => c.CarModel.MakeId == query.MakeId.Value);
@@ -263,7 +272,7 @@ namespace AutoMarket.Services
                 "price_desc" => q.OrderByDescending(c => c.Price),
                 "km_asc" => q.OrderBy(c => c.MileageKm),
                 "year_desc" => q.OrderByDescending(c => c.Year),
-                _ => q.OrderByDescending(c => c.Id) // newest
+                _ => q.OrderByDescending(c => c.Id)
             };
 
             var total = await q.CountAsync();
@@ -280,6 +289,7 @@ namespace AutoMarket.Services
         {
             return await context.Cars
                 .AsNoTracking()
+                .Where(c => !c.IsDeleted && !c.IsSold) // ✅ NEW
                 .Include(c => c.Images)
                 .Include(c => c.CarModel).ThenInclude(cm => cm.Make)
                 .OrderByDescending(c => c.Id)

@@ -1,0 +1,81 @@
+﻿@model List<AutoMarket.Models.Order>
+@using AutoMarket.Helpers
+@using AutoMarket.Models
+
+<h2 style="margin-bottom:14px;">Моите резервации</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="pd-surface" style="padding:16px;">
+        <div style="color:rgba(255,255,255,.8); font-weight:700;">Нямате резервации.</div>
+        <div style="color:rgba(255,255,255,.6); margin-top:6px;">
+            Когато резервирате оглед, той ще се появи тук.
+        </div>
+        <div style="margin-top:12px;">
+            <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Виж обявите</a>
+        </div>
+    </div>
+}
+else
+{
+    <div style="display:grid; gap:12px;">
+        @foreach (var o in Model)
+        {
+            var makeName = o.Car?.CarModel?.Make?.Name ?? "Неизвестна марка";
+            var modelName = o.Car?.CarModel?.Name ?? "Неизвестен модел";
+            var yearText = o.Car?.Year.ToString() ?? "—";
+
+            <div class="pd-surface" style="padding:14px;">
+                <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <div>
+                        <div style="font-weight:850;">
+                            <a asp-controller="Cars" asp-action="Details" asp-route-id="@o.CarId">
+                                @makeName @modelName (@yearText)
+                            </a>
+
+                            @if (o.Car == null || o.Car.CarModel == null || o.Car.CarModel.Make == null)
+                            {
+                                <div style="margin-top:6px; color:rgba(255,255,255,.55); font-size:12px;">
+                                    (Липсват пълни данни за автомобила — вероятно е премахнат или е скрит от филтър.)
+                                </div>
+                            }
+                        </div>
+
+                        <div style="color:rgba(255,255,255,.6); font-size:13px; margin-top:4px;">
+                            @o.CreatedOn.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="pd-badge">
+                            Статус:
+                            <b style="color:rgba(255,255,255,.9)">@o.Status.ToDisplayName()</b>
+                        </span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(o.Note))
+                {
+                    <div style="margin-top:10px; color:rgba(255,255,255,.72);">
+                        Бележка: @o.Note
+                    </div>
+                }
+
+                @if (o.Status == OrderStatus.Rejected)
+                {
+                    <form asp-controller="Orders"
+                          asp-action="DeleteRejected"
+                          asp-route-id="@o.Id"
+                          method="post"
+                          style="margin-top:12px;"
+                          onsubmit="return confirm('Да премахна ли тази отхвърлена резервация?');">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-outline-danger btn-sm" style="border-radius:12px;">
+                            Премахни
+                        </button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+}

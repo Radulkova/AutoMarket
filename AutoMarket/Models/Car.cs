@@ -46,6 +46,9 @@ namespace AutoMarket.Models
 
         public IdentityUser Seller { get; set; } = null!;
         public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
+
+        public bool IsSold { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
 

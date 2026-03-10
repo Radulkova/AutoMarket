@@ -152,6 +152,9 @@ namespace AutoMarket.Data
 
                  CreateCar(await EnsureModel("BMW","X6"), 2022, 128000, 122000, 3000, 300, "Бензин", "Автоматична",
                     "BMW X6, запазена и модерна.", "/img/cars/bmw-x6.jpg", admin.Id),
+                           
+                CreateCar(await EnsureModel("BMW","X5"), 2006, 9999, 218400, 2993, 218, "Дизел", "Автоматична",
+                    "BMW X5 Употребяван автомобил, в добро състояние.", "/img/cars/bmw-x52.jpg", admin.Id),
 
                 // Mercedes-Benz
                 CreateCar(await EnsureModel("Mercedes-Benz","C-Class"), 2019, 69800, 99000, 1950, 194, "Дизел", "Автоматична",
@@ -270,6 +273,9 @@ namespace AutoMarket.Data
 
                  CreateCar(await EnsureModel("Mini","Cooper"), 2005, 7300, 195000, 1600, 116, "Бензин", "Ръчна",
                     "Cooper, без забележки", "/img/cars/mini-coopeer2.jpg", admin.Id),
+                
+                CreateCar(await EnsureModel("Mini","Countryman"), 2014, 29999, 189700, 2000, 192, "Бензин", "Автоматична",
+                    "Countryman, 4x4,перфектно техническо състояние", "/img/cars/mini-countryman2.jpg", admin.Id),
 
             };
 

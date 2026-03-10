@@ -12,17 +12,24 @@ namespace AutoMarket.Data
             : base(options)
         {
         }
+        
 
         public DbSet<Make> Makes => Set<Make>();
         public DbSet<CarModel> CarModels => Set<CarModel>();
         public DbSet<Car> Cars => Set<Car>();
         public DbSet<Order> Orders => Set<Order>();
+        
         public DbSet<CarImage> CarImages => Set<CarImage>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Order>()
+              .HasOne(o => o.Car)
+              .WithMany()
+              .HasForeignKey(o => o.CarId)
+              .OnDelete(DeleteBehavior.Restrict);
             // (по желание) връзки/ограничения ако искаш да са explicit
             builder.Entity<CarModel>()
                 .HasOne(cm => cm.Make)

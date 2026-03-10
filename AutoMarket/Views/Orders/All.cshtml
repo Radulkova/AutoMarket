@@ -1,0 +1,108 @@
+﻿@model List<AutoMarket.Models.Order>
+@using AutoMarket.Helpers
+@using AutoMarket.Models
+
+<h2 style="margin-bottom:14px;">Резервации за оглед</h2>
+
+@if (!Model.Any())
+{
+    <div class="pd-surface" style="padding:16px;">
+        <div style="color:rgba(255,255,255,.8); font-weight:700;">Няма резервации.</div>
+        <div style="color:rgba(255,255,255,.6); margin-top:6px;">
+            Когато потребител резервира оглед, ще се появи тук.
+        </div>
+    </div>
+}
+else
+{
+    <div style="display:grid; gap:12px;">
+        @foreach (var o in Model)
+        {
+            <div class="pd-surface" style="padding:14px;">
+                <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:start;">
+                    <div>
+                        <div style="font-weight:850; font-size:18px;">
+                            <a asp-controller="Cars" asp-action="Details" asp-route-id="@o.CarId">
+                                @o.Car.CarModel.Make.Name @o.Car.CarModel.Name (@o.Car.Year)
+                            </a>
+                        </div>
+
+                        <div style="color:rgba(255,255,255,.6); font-size:13px; margin-top:4px;">
+                            @o.CreatedOn.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                        </div>
+
+                        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <span class="pd-badge">
+                                Статус:
+                                <b style="color:rgba(255,255,255,.9)">@o.Status.ToDisplayName()</b>
+                            </span>
+
+                            @if (!string.IsNullOrWhiteSpace(o.Buyer?.Email))
+                            {
+                                <span class="pd-badge">
+                                    Клиент:
+                                    <b style="color:rgba(255,255,255,.9)">@o.Buyer.Email</b>
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div style="min-width:260px;">
+                        <div class="pd-surface" style="padding:12px; box-shadow:none;">
+                            <div style="color:rgba(255,255,255,.6); font-size:13px;">Контакт за оглед</div>
+
+                            <div style="margin-top:6px; font-weight:800;">
+                                @o.ContactFirstName @o.ContactLastName
+                            </div>
+
+                            <div style="margin-top:4px; color:rgba(255,255,255,.75);">
+                                Телефон: <b style="color:rgba(255,255,255,.9)">@o.ContactPhone</b>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(o.Note))
+                            {
+                                <div style="margin-top:8px; color:rgba(255,255,255,.72);">
+                                    Бележка: @o.Note
+                                </div>
+                            }
+                        </div>
+
+                        @if (o.Status == OrderStatus.Pending)
+                        {
+                            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+                                <form asp-action="Approve" asp-route-id="@o.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-success btn-sm" style="border-radius:12px;">
+                                        Одобри
+                                    </button>
+                                </form>
+
+                                <form asp-action="Reject" asp-route-id="@o.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-danger btn-sm" style="border-radius:12px;">
+                                        Откажи
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                        else if (o.Status == OrderStatus.Rejected)
+                        {
+                            <form asp-action="DeleteRejected" asp-route-id="@o.Id" method="post" style="margin-top:10px;">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-outline-danger btn-sm" style="border-radius:12px;">
+                                    Премахни
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div style="margin-top:10px; color:rgba(255,255,255,.6); font-size:13px;">
+                                Няма действия (статусът вече е финализиран).
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,46 @@
+﻿@model List<AutoMarket.Models.Order>
+
+<h2>Резервации за одобрение</h2>
+
+@if (!Model.Any())
+{
+    <p>Няма чакащи резервации.</p>
+}
+else
+{
+    <table class="table table-dark table-striped">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Автомобил</th>
+                <th>Клиент</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.CreatedOn.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        <a asp-controller="Cars" asp-action="Details" asp-route-id="@o.CarId">
+                            @(o.Car.CarModel.Make.Name) @(o.Car.CarModel.Name) (@o.Car.Year)
+                        </a>
+                    </td>
+                    <td>@o.Buyer?.Email</td>
+                    <td class="d-flex gap-2">
+                        <form asp-action="Approve" asp-route-id="@o.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-success btn-sm">Одобри</button>
+                        </form>
+
+                        <form asp-action="Reject" asp-route-id="@o.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-danger btn-sm">Откажи</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

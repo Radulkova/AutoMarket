@@ -38,8 +38,11 @@ builder.Services.AddRazorPages();
 // ===============================
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICarModelService, CarModelService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
-
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 builder.Services.AddSingleton<IEmailSender, AutoMarket.Services.NoOpEmailSender>();
 
 var app = builder.Build();
