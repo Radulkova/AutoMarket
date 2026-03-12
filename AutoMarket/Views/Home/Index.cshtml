@@ -1,94 +1,106 @@
-﻿@{
+﻿@model AutoMarket.ViewModels.HomeViewModel
+
+@{
     ViewData["Title"] = "Начало";
+
+    string CarImage(AutoMarket.Models.Car car)
+    {
+        var mainImage = car.Images?
+            .OrderByDescending(i => i.IsMain)
+            .ThenBy(i => i.SortOrder)
+            .FirstOrDefault()?.Url;
+
+        if (!string.IsNullOrWhiteSpace(mainImage))
+        {
+            return mainImage;
+        }
+
+        if (!string.IsNullOrWhiteSpace(car.ImageUrl))
+        {
+            return car.ImageUrl;
+        }
+
+        return "/images/no-image.jpg";
+    }
 }
 
-<div class="pd-container" style="padding-top:14px;">
+<div class="container py-4">
 
-    <!-- HERO (не прилича на /Cars) -->
-    <section class="pd-hero" style="margin-bottom:18px; position:relative; overflow:hidden;">
-        <div style="position:absolute; inset:-120px; background:
-            radial-gradient(600px 240px at 15% 30%, rgba(90,167,255,.35), transparent 60%),
-            radial-gradient(520px 220px at 80% 20%, rgba(34,197,94,.22), transparent 55%),
-            radial-gradient(560px 260px at 70% 75%, rgba(168,85,247,.20), transparent 60%);
-            filter: blur(0px);
-            opacity:.9;"></div>
-
-        <div style="position:relative; display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; align-items:center;">
+    <section class="pd-hero" style="margin-bottom: 18px;">
+        <div style="display:grid; grid-template-columns:1.25fr .75fr; gap:18px; align-items:stretch;">
             <div>
-                <div class="pd-badge" style="display:inline-flex; gap:8px; align-items:center; margin-bottom:10px;">
-                    🚗 Платформа за обяви • Premium Dark
-                </div>
+                <div class="pd-badge" style="margin-bottom:12px;">Онлайн пазар за автомобили</div>
 
-                <h1 style="margin:0 0 10px 0; letter-spacing:.2px;">
-                    Намери точната кола<br />за твоя стил и бюджет
+                <h1 style="font-size:clamp(1rem, 3vw, 2.2rem); line-height:1.08; margin:0 0 12px; font-weight:950;">
+                    Намери следващия си автомобил
+                    <span style="display:block; color:var(--pd-gold);">бързо, лесно и сигурно</span>
                 </h1>
 
-                <p style="margin:0 0 14px 0; color:rgba(255,255,255,.75); font-size:16px; line-height:1.6;">
-                    Търси бързо, сравнявай спокойно и се свържи директно с продавача.
-                    Без излишни стъпки — само смислени филтри и реални снимки.
+                <p style="max-width:760px; color:rgba(255,255,255,.78); font-size:1.05rem; line-height:1.75; margin:0 0 18px;">
+                    Разгледай актуални обяви, филтрирай по важните за теб критерии и открий най-подходящия автомобил.
                 </p>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <a class="pd-btn pd-btn-primary" href="/Cars">Разгледай обяви</a>
+                    <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Разгледай обявите</a>
                     <a class="pd-btn" href="#smartSearch">Умно търсене</a>
-                </div>
-
-                <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <span class="pd-badge">✅ Реални снимки</span>
-                    <span class="pd-badge">⚡ Бързи филтри</span>
-                    <span class="pd-badge">📞 Контакт с продавача</span>
-                    <span class="pd-badge">🔒 Сигурна регистрация</span>
                 </div>
             </div>
 
-            <!-- “Инфо панел” вместо карти -->
-            <div class="pd-surface" style="padding:16px;">
-                <div style="font-weight:900; margin-bottom:10px; font-size:18px;">Днес в AutoMarket</div>
+            <div style="display:grid; gap:12px;">
+                <div class="pd-surface" style="padding:14px; box-shadow:none;">
+                    <div style="color:rgba(255,255,255,.6); font-size:13px;">Какво получаваш</div>
+                    <div style="font-weight:850; margin-top:6px;">Филтриране, детайли и лесен достъп до обявите</div>
+                </div>
 
-                <div style="display:grid; gap:10px;">
-                    <div class="pd-surface" style="padding:12px; box-shadow:none;">
-                        <div style="color:rgba(255,255,255,.6); font-size:13px;">Фокус</div>
-                        <div style="font-weight:850;">Бързо търсене по марка/модел</div>
-                    </div>
+                <div class="pd-surface" style="padding:14px; box-shadow:none;">
+                    <div style="color:rgba(255,255,255,.6); font-size:13px;">Насочване</div>
+                    <div style="font-weight:850; margin-top:6px;">Избери марка, модел, гориво и скорости само с няколко клика</div>
+                </div>
 
-                    <div class="pd-surface" style="padding:12px; box-shadow:none;">
-                        <div style="color:rgba(255,255,255,.6); font-size:13px;">Съвет</div>
-                        <div style="font-weight:850;">Виж “Детайли” и свържи се с продавача</div>
-                    </div>
+               
 
-                    <div class="pd-surface" style="padding:12px; box-shadow:none;">
-                        <div style="color:rgba(255,255,255,.6); font-size:13px;">Най-търсени</div>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
-                            <a class="pd-badge" href="/Cars?FuelType=Дизел">Дизел</a>
-                            <a class="pd-badge" href="/Cars?FuelType=Бензин">Бензин</a>
-                            <a class="pd-badge" href="/Cars?Transmission=Автоматична">Автоматик</a>
-                            <a class="pd-badge" href="/Cars?FuelType=Хибрид">Хибрид</a>
-                        </div>
+                <div class="pd-surface" style="padding:14px; box-shadow:none;">
+                    <div style="color:rgba(255,255,255,.6); font-size:13px;">Популярни търсения</div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                        <a class="pd-badge" asp-controller="Cars" asp-action="Index" asp-route-FuelType="Дизел">Дизел</a>
+                        <a class="pd-badge" asp-controller="Cars" asp-action="Index" asp-route-FuelType="Бензин">Бензин</a>
+                        <a class="pd-badge" asp-controller="Cars" asp-action="Index" asp-route-Transmission="Автоматична">Автоматик</a>
+                        <a class="pd-badge" asp-controller="Cars" asp-action="Index" asp-route-FuelType="Хибрид">Хибрид</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SMART SEARCH (иновация: “one-shot” търсене) -->
     <section id="smartSearch" class="pd-surface" style="padding:16px; margin-bottom:18px;">
         <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:flex-end;">
             <div>
                 <div style="font-weight:900; font-size:20px; margin-bottom:6px;">Умно търсене</div>
                 <div style="color:rgba(255,255,255,.65);">
-                    Избери марка/модел и тръгваш директно към резултатите.
+                    Избери марка и модел от реалните данни в системата и премини директно към резултатите.
                 </div>
             </div>
-            <a class="pd-btn" href="/Cars">Разширени филтри →</a>
+
+            <a class="pd-btn" asp-controller="Cars" asp-action="Index">Разширени филтри →</a>
         </div>
 
         <div style="margin-top:12px;">
-            <form method="get" action="/Cars" class="row g-3 align-items-end">
+            <form method="get" asp-controller="Cars" asp-action="Index" class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label" style="color:rgba(255,255,255,.75)">Марка</label>
                     <select class="form-select" id="makeSelect" name="MakeId">
                         <option value="">Всички</option>
-                        <!-- ще се пълни от server ако искаш, но може и статично да оставиш -->
+                        @foreach (var make in Model.Makes)
+                        {
+                            if (Model.MakeId.HasValue && Model.MakeId.Value.ToString() == make.Value)
+                            {
+                                <option value="@make.Value" selected>@make.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@make.Value">@make.Text</option>
+                            }
+                        }
                     </select>
                 </div>
 
@@ -96,6 +108,17 @@
                     <label class="form-label" style="color:rgba(255,255,255,.75)">Модел</label>
                     <select class="form-select" id="modelSelect" name="CarModelId">
                         <option value="">Всички</option>
+                        @foreach (var carModel in Model.CarModels)
+                        {
+                            if (Model.CarModelId.HasValue && Model.CarModelId.Value.ToString() == carModel.Value)
+                            {
+                                <option value="@carModel.Value" selected>@carModel.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@carModel.Value">@carModel.Text</option>
+                            }
+                        }
                     </select>
                 </div>
 
@@ -103,11 +126,50 @@
                     <label class="form-label" style="color:rgba(255,255,255,.75)">Гориво</label>
                     <select class="form-select" name="FuelType">
                         <option value="">Всички</option>
-                        <option value="Бензин">Бензин</option>
-                        <option value="Дизел">Дизел</option>
-                        <option value="Хибрид">Хибрид</option>
-                        <option value="Електрическа">Електрическа</option>
-                        <option value="Газ">Газ</option>
+                        @if (Model.FuelType == "Бензин")
+                        {
+                            <option value="Бензин" selected>Бензин</option>
+                        }
+                        else
+                        {
+                            <option value="Бензин">Бензин</option>
+                        }
+
+                        @if (Model.FuelType == "Дизел")
+                        {
+                            <option value="Дизел" selected>Дизел</option>
+                        }
+                        else
+                        {
+                            <option value="Дизел">Дизел</option>
+                        }
+
+                        @if (Model.FuelType == "Хибрид")
+                        {
+                            <option value="Хибрид" selected>Хибрид</option>
+                        }
+                        else
+                        {
+                            <option value="Хибрид">Хибрид</option>
+                        }
+
+                        @if (Model.FuelType == "Електрическа")
+                        {
+                            <option value="Електрическа" selected>Електрическа</option>
+                        }
+                        else
+                        {
+                            <option value="Електрическа">Електрическа</option>
+                        }
+
+                        @if (Model.FuelType == "Газ")
+                        {
+                            <option value="Газ" selected>Газ</option>
+                        }
+                        else
+                        {
+                            <option value="Газ">Газ</option>
+                        }
                     </select>
                 </div>
 
@@ -115,8 +177,23 @@
                     <label class="form-label" style="color:rgba(255,255,255,.75)">Скорости</label>
                     <select class="form-select" name="Transmission">
                         <option value="">Всички</option>
-                        <option value="Ръчна">Ръчна</option>
-                        <option value="Автоматична">Автоматична</option>
+                        @if (Model.Transmission == "Ръчна")
+                        {
+                            <option value="Ръчна" selected>Ръчна</option>
+                        }
+                        else
+                        {
+                            <option value="Ръчна">Ръчна</option>
+                        }
+
+                        @if (Model.Transmission == "Автоматична")
+                        {
+                            <option value="Автоматична" selected>Автоматична</option>
+                        }
+                        else
+                        {
+                            <option value="Автоматична">Автоматична</option>
+                        }
                     </select>
                 </div>
 
@@ -126,28 +203,83 @@
             </form>
         </div>
 
-        <!-- “Бързи маршрути” (много marketplace чувство) -->
         <div style="margin-top:14px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;">
-            <a class="pd-surface" href="/Cars?PriceTo=20000" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
+            <a class="pd-surface" asp-controller="Cars" asp-action="Index" asp-route-PriceTo="20000" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
                 <div style="color:rgba(255,255,255,.65); font-size:13px;">Под</div>
                 <div style="font-weight:900;">20 000 €</div>
             </a>
-            <a class="pd-surface" href="/Cars?PriceFrom=20000&PriceTo=50000" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
+
+            <a class="pd-surface" asp-controller="Cars" asp-action="Index" asp-route-PriceFrom="20000" asp-route-PriceTo="50000" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
                 <div style="color:rgba(255,255,255,.65); font-size:13px;">От</div>
-                <div style="font-weight:900;">20–50k €</div>
+                <div style="font-weight:900;">20–50 хиляди €</div>
             </a>
-            <a class="pd-surface" href="/Cars?YearFrom=2020" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
+
+            <a class="pd-surface" asp-controller="Cars" asp-action="Index" asp-route-YearFrom="2020" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
                 <div style="color:rgba(255,255,255,.65); font-size:13px;">Година</div>
-                <div style="font-weight:900;">2020+</div>
+                <div style="font-weight:900;">2020 +</div>
             </a>
-            <a class="pd-surface" href="/Cars?Transmission=Автоматична" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
+
+            <a class="pd-surface" asp-controller="Cars" asp-action="Index" asp-route-Transmission="Автоматична" style="padding:12px; text-decoration:none; color:inherit; box-shadow:none;">
                 <div style="color:rgba(255,255,255,.65); font-size:13px;">Търсени</div>
                 <div style="font-weight:900;">Автоматик</div>
             </a>
         </div>
     </section>
 
-    <!-- HOW IT WORKS (доверие + UX) -->
+    <section class="pd-surface" style="padding:16px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+            <div style="font-weight:900; font-size:20px;">Последно добавени автомобили</div>
+            <a class="pd-btn" asp-controller="Cars" asp-action="Index">Виж всички →</a>
+        </div>
+
+        @if (Model.LatestCars != null && Model.LatestCars.Any())
+        {
+            <div class="pd-grid" style="gap:14px;">
+                @foreach (var car in Model.LatestCars)
+                {
+                    var imageUrl = CarImage(car);
+
+                    <article class="pd-card" style="overflow:hidden;">
+                        <a asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id" style="text-decoration:none; color:inherit;">
+                            <div style="aspect-ratio:16/10; overflow:hidden; background:#111;">
+                                <img src="@imageUrl"
+                                     alt="@(car.CarModel?.Make?.Name + " " + car.CarModel?.Name)"
+                                     style="width:100%; height:100%; object-fit:cover;" />
+                            </div>
+
+                            <div style="padding:14px;">
+                                <div style="font-weight:900; font-size:18px; margin-bottom:6px;">
+                                    @car.CarModel?.Make?.Name @car.CarModel?.Name
+                                </div>
+
+                                <div style="color:rgba(255,255,255,.7); margin-bottom:10px;">
+                                    @car.Year г. • @car.FuelType • @car.Transmission
+                                </div>
+
+                                <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+                                    <div style="font-size:22px; font-weight:950; color:var(--pd-gold);">
+                                        @car.Price.ToString("0.##") €
+                                    </div>
+
+                                    <span class="pd-badge">@car.MileageKm км</span>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="pd-surface" style="padding:16px; box-shadow:none;">
+                <div style="font-weight:800; margin-bottom:6px;">Няма налични автомобили</div>
+                <div style="color:rgba(255,255,255,.7);">
+                    Все още няма добавени обяви, които да бъдат показани на началната страница.
+                </div>
+            </div>
+        }
+    </section>
+
     <section class="pd-surface" style="padding:16px; margin-bottom:18px;">
         <div style="font-weight:900; font-size:20px; margin-bottom:10px;">Как работи</div>
 
@@ -156,7 +288,7 @@
                 <div class="pd-badge" style="display:inline-block; margin-bottom:8px;">1</div>
                 <div style="font-weight:850; margin-bottom:6px;">Избираш критерии</div>
                 <div style="color:rgba(255,255,255,.7); line-height:1.55;">
-                    Марка, модел, гориво, скоростна кутия и бюджет — само важните неща.
+                    Избери марка, модел, гориво, скоростна кутия и други филтри според предпочитанията си.
                 </div>
             </div>
 
@@ -164,7 +296,7 @@
                 <div class="pd-badge" style="display:inline-block; margin-bottom:8px;">2</div>
                 <div style="font-weight:850; margin-bottom:6px;">Разглеждаш детайли</div>
                 <div style="color:rgba(255,255,255,.7); line-height:1.55;">
-                    Снимки, характеристики и описание — всичко на едно място.
+                    Всяка обява съдържа снимки, технически данни, цена и подробно описание.
                 </div>
             </div>
 
@@ -172,26 +304,27 @@
                 <div class="pd-badge" style="display:inline-block; margin-bottom:8px;">3</div>
                 <div style="font-weight:850; margin-bottom:6px;">Свързваш се с продавача</div>
                 <div style="color:rgba(255,255,255,.7); line-height:1.55;">
-                    Директен контакт по телефон/имейл (през профила на продавача).
+                    След като избереш автомобил, можеш да продължиш към детайлите и заявка за резервация.
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FINAL CTA -->
     <section class="pd-hero" style="margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
             <div>
-                <div style="font-weight:950; font-size:20px; margin-bottom:6px;">Готова ли си да започнеш?</div>
-                <div style="color:rgba(255,255,255,.7);">Разгледай обявите или използвай умното търсене.</div>
+                <div style="font-weight:950; font-size:20px; margin-bottom:6px;">Готов ли си да започнеш?</div>
+                <div style="color:rgba(255,255,255,.7);">
+                    Разгледай обявите или използвай умното търсене, за да стигнеш по-бързо до точния автомобил.
+                </div>
             </div>
+
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <a class="pd-btn pd-btn-primary" href="/Cars">Към обявите</a>
+                <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Към обявите</a>
                 <a class="pd-btn" href="#smartSearch">Търси сега</a>
             </div>
         </div>
     </section>
-
 </div>
 
 @section Scripts {
@@ -199,46 +332,47 @@
         (function () {
             const makeSelect = document.getElementById('makeSelect');
             const modelSelect = document.getElementById('modelSelect');
+            const selectedModelId = '@(Model.CarModelId?.ToString() ?? "")';
 
-            // Минимален “умно”: зареждаме марки от /Cars (взима ги от ViewModel там)
-            // Ако не искаш това — кажи и ще го направим server-side.
-            async function loadMakes() {
-                // Тук най-лесно: ако не искаш да пипаме backend,
-                // ще оставиш марките празни и ще ползваш директно /Cars.
-                // Но можеш да ги добавиш статично, ако искаш.
-                // За момента — добави най-често ползвани:
-                const common = ["Audi","BMW","Mercedes-Benz","Volkswagen","Toyota","Honda","Ford","Hyundai","Kia","Skoda","Mazda","Nissan","Opel","Peugeot","Renault"];
-                for (const name of common) {
-                    const opt = document.createElement('option');
-                    opt.value = name; // ще го пренасочим по-долу към /Cars като текст
-                    opt.textContent = name;
-                    makeSelect.appendChild(opt);
+            async function loadModels(makeId, selectedValue) {
+                modelSelect.innerHTML = '<option value="">Всички</option>';
+
+                if (!makeId) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Home/GetModelsByMake?makeId=' + encodeURIComponent(makeId));
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const models = await response.json();
+
+                    for (const model of models) {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.name;
+
+                        if (selectedValue && selectedValue === String(model.id)) {
+                            option.selected = true;
+                        }
+
+                        modelSelect.appendChild(option);
+                    }
+                } catch {
+                    modelSelect.innerHTML = '<option value="">Всички</option>';
                 }
             }
 
-            async function loadModelsByMakeName(makeName) {
-                modelSelect.innerHTML = '';
-                const optAll = document.createElement('option');
-                optAll.value = '';
-                optAll.textContent = 'Всички';
-                modelSelect.appendChild(optAll);
-
-                if (!makeName) return;
-
-                // Трик без backend промяна:
-                // пращаме към /Cars и там се избира MakeId, а не име.
-                // Затова тук НЕ можем коректно да вземем модели само по име,
-                // освен ако не направим endpoint по име.
-                // За да не те лъжа: оставяме моделите празни и се ползва /Cars за детайлното.
-            }
-
-            // Ако искаш реални модели тук: ще добавим endpoint /Cars/MakeIdByName + /Cars/ModelsByMake.
-            // Засега: когато се избере марка, просто чистим моделите.
             makeSelect.addEventListener('change', function () {
-                loadModelsByMakeName(makeSelect.value);
+                loadModels(makeSelect.value, '');
             });
 
-            loadMakes();
+            if (makeSelect.value) {
+                loadModels(makeSelect.value, selectedModelId);
+            }
         })();
     </script>
 }
