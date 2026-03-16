@@ -2,11 +2,97 @@
 
 @{
     ViewData["Title"] = "Коли";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }
+
+<style>
+    .favorite-toggle-form {
+        margin: 0;
+    }
+
+    .favorite-icon-btn {
+        width: 46px;
+        height: 46px;
+        border: 1px solid rgba(255,255,255,.16);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8,12,20,.82);
+        color: rgba(255,255,255,.72);
+        transition: all .2s ease;
+        box-shadow: 0 10px 24px rgba(0,0,0,.20);
+        backdrop-filter: blur(4px);
+        cursor: pointer;
+    }
+
+        .favorite-icon-btn:hover {
+            transform: translateY(-1px) scale(1.03);
+            color: #ffffff;
+            border-color: rgba(255,255,255,.28);
+            background: rgba(18,24,36,.92);
+        }
+
+        .favorite-icon-btn.is-active {
+            color: #f4c542;
+            border-color: rgba(244,197,66,.45);
+            background: rgba(244,197,66,.12);
+            box-shadow: 0 10px 24px rgba(244,197,66,.12);
+        }
+
+        .favorite-icon-btn svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+    .card-image-wrap {
+        position: relative;
+    }
+
+    .card-favorite-floating {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+    }
+
+    .favorite-login-link {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background: rgba(8,12,20,.82);
+        color: rgba(255,255,255,.72);
+        border: 1px solid rgba(255,255,255,.16);
+        box-shadow: 0 10px 24px rgba(0,0,0,.20);
+        backdrop-filter: blur(4px);
+        transition: all .2s ease;
+    }
+
+        .favorite-login-link:hover {
+            color: #ffffff;
+            border-color: rgba(255,255,255,.28);
+            background: rgba(18,24,36,.92);
+            transform: translateY(-1px) scale(1.03);
+        }
+
+        .favorite-login-link svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+</style>
 
 <div class="pd-container">
 
-    <!-- HERO -->
     <div class="pd-hero">
         <h1>Налични автомобили</h1>
         <p>Търси, филтрирай и разглеждай обяви.</p>
@@ -19,7 +105,6 @@
         </div>
     </div>
 
-    <!-- FILTERS -->
     <div id="filtersCard" class="pd-surface" style="padding:16px; margin-bottom:18px;">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
             <div>
@@ -108,7 +193,6 @@
         </form>
     </div>
 
-    <!-- RESULTS -->
     @if (!Model.Cars.Any())
     {
         <div class="pd-surface" style="padding:16px;">
@@ -121,7 +205,6 @@
         <div class="pd-grid">
             @foreach (var car in Model.Cars)
             {
-                // Главна снимка от CarImages (Variant B)
                 var mainImg =
                 car.Images?
                 .OrderByDescending(i => i.IsMain)
@@ -129,8 +212,61 @@
                 .FirstOrDefault()?.Url
                 ?? "/img/no-car.jpg";
 
+                var isFavorite = Model.FavoriteCarIds.Contains(car.Id);
+                var favoriteTitle = isFavorite ? "Премахни от Любими" : "Добави в Любими";
+
                 <div class="pd-card">
-                    <img class="pd-card-img" src="@mainImg" alt="car" />
+                    <div class="card-image-wrap">
+                        <img class="pd-card-img" src="@mainImg" alt="car" />
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="card-favorite-floating">
+                                <form asp-controller="Favorites" asp-action="Toggle" method="post" class="favorite-toggle-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="carId" value="@car.Id" />
+                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                                    <button type="submit"
+                                            class="favorite-icon-btn @(isFavorite ? "is-active" : "")"
+                                            title="@favoriteTitle"
+                                            aria-label="@favoriteTitle">
+                                        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 38L16 26C17.2 22.4 20.5 20 24.3 20H39.7C43.5 20 46.8 22.4 48 26L52 38"
+                                                  stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M10 38H54V46C54 48.2 52.2 50 50 50H14C11.8 50 10 48.2 10 46V38Z"
+                                                  stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" />
+                                            <path d="M20 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                            <path d="M44 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                            <circle cx="18" cy="43" r="2.6" fill="currentColor" />
+                                            <circle cx="46" cy="43" r="2.6" fill="currentColor" />
+                                            <path d="M22 20L26 12H38L42 20" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="favorite-login-link"
+                               asp-area="Identity"
+                               asp-page="/Account/Login"
+                               title="Влез, за да добавяш в Любими"
+                               aria-label="Влез, за да добавяш в Любими">
+                                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 38L16 26C17.2 22.4 20.5 20 24.3 20H39.7C43.5 20 46.8 22.4 48 26L52 38"
+                                          stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M10 38H54V46C54 48.2 52.2 50 50 50H14C11.8 50 10 48.2 10 46V38Z"
+                                          stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" />
+                                    <path d="M20 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                    <path d="M44 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                    <circle cx="18" cy="43" r="2.6" fill="currentColor" />
+                                    <circle cx="46" cy="43" r="2.6" fill="currentColor" />
+                                    <path d="M22 20L26 12H38L42 20" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </a>
+                        }
+                    </div>
 
                     <div class="pd-card-body">
                         <div class="pd-title">@car.CarModel.Make.Name @car.CarModel.Name</div>
@@ -144,13 +280,14 @@
 
                         <div class="pd-price">@car.Price.ToString("N0") €</div>
 
-                        <a class="pd-btn" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
+                        <div style="display:grid; gap:8px;">
+                            <a class="pd-btn" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
+                        </div>
                     </div>
                 </div>
             }
         </div>
 
-        <!-- Paging -->
         @if (Model.TotalPages > 1)
         {
             <nav class="mt-4">
@@ -236,7 +373,9 @@
                     const opt = document.createElement('option');
                     opt.value = m.id;
                     opt.textContent = m.name;
-                    if (selectedModelId && String(selectedModelId) === String(m.id)) opt.selected = true;
+                    if (selectedModelId && String(selectedModelId) === String(m.id)) {
+                        opt.selected = true;
+                    }
                     modelSelect.appendChild(opt);
                 }
             }

@@ -20,11 +20,62 @@
     var sellerName = Model.Seller?.UserName ?? "Продавач";
     var sellerEmail = Model.Seller?.Email;
     var sellerPhone = Model.Seller?.PhoneNumber;
+    var isFavorite = ViewBag.IsFavorite is bool value && value;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var favoriteTitle = isFavorite ? "Премахни от Любими" : "Добави в Любими";
 }
+
+<style>
+    .favorite-toggle-form {
+        margin: 0;
+    }
+
+    .favorite-icon-btn {
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(255,255,255,.16);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8,12,20,.82);
+        color: rgba(255,255,255,.72);
+        transition: all .2s ease;
+        box-shadow: 0 10px 24px rgba(0,0,0,.20);
+        backdrop-filter: blur(4px);
+        cursor: pointer;
+    }
+
+        .favorite-icon-btn:hover {
+            transform: translateY(-1px) scale(1.03);
+            color: #ffffff;
+            border-color: rgba(255,255,255,.28);
+            background: rgba(18,24,36,.92);
+        }
+
+        .favorite-icon-btn.is-active {
+            color: #f4c542;
+            border-color: rgba(244,197,66,.45);
+            background: rgba(244,197,66,.12);
+            box-shadow: 0 10px 24px rgba(244,197,66,.12);
+        }
+
+        .favorite-icon-btn svg {
+            width: 26px;
+            height: 26px;
+            display: block;
+        }
+
+    .details-top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+</style>
 
 <div class="pd-container">
 
-    <!-- HEADER / TITLE -->
     <div class="pd-hero" style="margin-bottom:16px;">
         <h1 style="margin-bottom:6px;">@Model.CarModel.Make.Name @Model.CarModel.Name</h1>
         <p style="margin-bottom:0;">
@@ -41,7 +92,6 @@
 
     <div class="pd-grid" style="align-items:start;">
 
-        <!-- LEFT: GALLERY -->
         <div style="grid-column: span 7;">
             <div class="pd-surface" style="padding:14px;">
                 <img id="mainCarImg"
@@ -74,7 +124,6 @@
             </div>
         </div>
 
-        <!-- RIGHT: PRICE + SPECS -->
         <div style="grid-column: span 5;">
             <div class="pd-surface" style="padding:16px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
@@ -91,15 +140,37 @@
                     <span class="pd-badge">Мощност: <b style="color:rgba(255,255,255,.9)">@Model.HorsePower hp</b></span>
                 </div>
 
-                <!-- RESERVE VIEWING (opens modal) -->
-                <div style="margin-top:14px;">
+                <div class="details-top-actions" style="margin-top:16px;">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
+                        <form asp-controller="Favorites" asp-action="Toggle" method="post" class="favorite-toggle-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="carId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                            <button type="submit"
+                                    class="favorite-icon-btn @(isFavorite ? "is-active" : "")"
+                                    title="@favoriteTitle"
+                                    aria-label="@favoriteTitle">
+                                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 38L16 26C17.2 22.4 20.5 20 24.3 20H39.7C43.5 20 46.8 22.4 48 26L52 38"
+                                          stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M10 38H54V46C54 48.2 52.2 50 50 50H14C11.8 50 10 48.2 10 46V38Z"
+                                          stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" />
+                                    <path d="M20 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                    <path d="M44 50V54" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" />
+                                    <circle cx="18" cy="43" r="2.6" fill="currentColor" />
+                                    <circle cx="46" cy="43" r="2.6" fill="currentColor" />
+                                    <path d="M22 20L26 12H38L42 20" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </form>
+
                         if (!Model.IsSold)
                         {
                             <button type="button"
-                                    class="btn btn-warning w-100"
-                                    style="border-radius:12px;"
+                                    class="btn btn-warning"
+                                    style="border-radius:12px; min-height:52px; padding-inline:18px;"
                                     data-bs-toggle="modal"
                                     data-bs-target="#reserveViewingModal">
                                 Резервирай оглед
@@ -115,7 +186,7 @@
                     else
                     {
                         <p style="margin:0;">
-                            <a asp-area="Identity" asp-page="/Account/Login">Влез</a>, за да резервираш оглед.
+                            <a asp-area="Identity" asp-page="/Account/Login">Влез</a>, за да добавиш в Любими и да резервираш оглед.
                         </p>
                     }
                 </div>
@@ -135,7 +206,6 @@
                 </div>
             </div>
 
-            <!-- DESCRIPTION -->
             <div class="pd-surface" style="padding:16px;">
                 <div style="font-weight:800; margin-bottom:8px;">Описание</div>
 
@@ -160,6 +230,7 @@
                               asp-route-id="@Model.Id"
                               method="post"
                               onsubmit="return confirm('Сигурна ли си, че искаш да изтриеш тази обява?');">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="pd-btn" style="border-color:rgba(255,80,80,.35);">
                                 Изтрий
                             </button>
@@ -171,7 +242,6 @@
     </div>
 </div>
 
-<!-- RESERVE VIEWING MODAL -->
 <div class="modal fade" id="reserveViewingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pd-surface" style="padding:14px;">
@@ -230,7 +300,6 @@
     </div>
 </div>
 
-<!-- CONTACT SELLER MODAL -->
 <div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content pd-surface" style="padding:14px;">

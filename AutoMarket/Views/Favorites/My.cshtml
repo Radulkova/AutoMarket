@@ -1,0 +1,75 @@
+﻿@model List<AutoMarket.Models.Car>
+
+@{
+    ViewData["Title"] = "Любими";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="pd-container">
+    <div class="pd-hero" style="margin-bottom:18px;">
+        <h1>Любими обяви</h1>
+        <p>Тук са автомобилите, които си запазила за по-късно разглеждане.</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="pd-surface" style="padding:16px;">
+            <div style="font-weight:800; margin-bottom:6px;">Все още нямаш любими обяви</div>
+            <div style="color:rgba(255,255,255,.7); margin-bottom:12px;">
+                Разгледай наличните автомобили и запази тези, които ти харесват.
+            </div>
+            <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Към обявите</a>
+        </div>
+    }
+    else
+    {
+        <div class="pd-grid">
+            @foreach (var car in Model)
+            {
+                var mainImg =
+                car.Images?
+                .OrderByDescending(i => i.IsMain)
+                .ThenBy(i => i.SortOrder)
+                .FirstOrDefault()?.Url
+                ?? (string.IsNullOrWhiteSpace(car.ImageUrl) ? "/img/no-car.jpg" : car.ImageUrl);
+
+                <div class="pd-card">
+                    <img class="pd-card-img" src="@mainImg" alt="car" />
+
+                    <div class="pd-card-body">
+                        <div class="pd-title">@car.CarModel.Make.Name @car.CarModel.Name</div>
+
+                        <div class="pd-badges">
+                            <span class="pd-badge">@car.Year</span>
+                            <span class="pd-badge">@car.MileageKm.ToString("N0") км</span>
+                            <span class="pd-badge">@car.FuelType</span>
+                            <span class="pd-badge">@car.Transmission</span>
+
+                            @if (car.IsSold)
+                            {
+                                <span class="pd-badge" style="border-color:rgba(255,80,80,.35); color:#ffb3b3;">Продаден</span>
+                            }
+                        </div>
+
+                        <div class="pd-price">@car.Price.ToString("N0") €</div>
+
+                        <div style="display:grid; gap:8px;">
+                            <a class="pd-btn" asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id">
+                                Виж детайли
+                            </a>
+
+                            <form asp-controller="Favorites" asp-action="Toggle" method="post" style="margin:0;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="carId" value="@car.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="pd-btn pd-btn-primary" style="width:100%;">
+                                    Премахни от Любими
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

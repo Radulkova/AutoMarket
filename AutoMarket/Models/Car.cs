@@ -1,7 +1,5 @@
-﻿using AutoMarket.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-
 
 namespace AutoMarket.Models
 {
@@ -23,10 +21,10 @@ namespace AutoMarket.Models
         public int MileageKm { get; set; }
 
         [Range(600, 10000)]
-        public int EngineCapacityCc { get; set; } 
+        public int EngineCapacityCc { get; set; }
 
         [Range(1, 3000)]
-        public int HorsePower { get; set; } 
+        public int HorsePower { get; set; }
 
         [Required, MaxLength(30)]
         public string FuelType { get; set; } = "Petrol";
@@ -40,15 +38,15 @@ namespace AutoMarket.Models
         [MaxLength(300)]
         public string? ImageUrl { get; set; }
 
-        
         [Required]
         public string SellerId { get; set; } = null!;
 
         public IdentityUser Seller { get; set; } = null!;
+
         public ICollection<CarImage> Images { get; set; } = new List<CarImage>();
+        public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 
         public bool IsSold { get; set; }
         public bool IsDeleted { get; set; }
     }
 }
-
