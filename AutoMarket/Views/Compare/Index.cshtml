@@ -1,0 +1,281 @@
+﻿@model AutoMarket.ViewModels.CompareViewModel
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Сравнение на автомобили";
+}
+
+<style>
+    .compare-header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .compare-table-wrap {
+        overflow-x: auto;
+    }
+
+    .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+        .compare-table th,
+        .compare-table td {
+            border: 1px solid rgba(255,255,255,.08);
+            padding: 14px 12px;
+            vertical-align: top;
+        }
+
+        .compare-table th {
+            background: rgba(255,255,255,.04);
+            color: rgba(255,255,255,.88);
+            font-weight: 800;
+            text-align: left;
+        }
+
+    .compare-feature-col {
+        width: 220px;
+        color: rgba(255,255,255,.72);
+        font-weight: 700;
+        background: rgba(255,255,255,.03);
+    }
+
+    .compare-car-top {
+        display: grid;
+        gap: 10px;
+    }
+
+    .compare-car-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: #111;
+    }
+
+    .compare-car-title {
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .compare-price {
+        color: var(--pd-gold);
+        font-size: 24px;
+        font-weight: 900;
+    }
+
+    .compare-empty {
+        padding: 20px;
+    }
+</style>
+
+<div class="pd-container">
+    <div class="pd-hero" style="margin-bottom:18px;">
+        <h1>Сравнение на автомобили</h1>
+        <p>
+            Сравни избраните обяви по основни технически и ценови характеристики.
+        </p>
+
+        <div class="compare-header-actions">
+            <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Добави още автомобили</a>
+
+            @if (Model.Cars.Any())
+            {
+                <form asp-controller="Compare" asp-action="Clear" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="pd-btn">Изчисти сравнението</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (!Model.Cars.Any())
+    {
+        <div class="pd-surface compare-empty">
+            <div style="font-size:20px; font-weight:900; margin-bottom:8px;">Все още няма избрани автомобили за сравнение</div>
+            <div style="color:rgba(255,255,255,.7); margin-bottom:14px;">
+                Добави до 3 автомобила от списъка с обяви или от страницата с детайли.
+            </div>
+            <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Към обявите</a>
+        </div>
+    }
+    else if (Model.Cars.Count < 2)
+    {
+        <div class="pd-surface compare-empty">
+            <div style="font-size:20px; font-weight:900; margin-bottom:8px;">Нужни са поне 2 автомобила за смислено сравнение</div>
+            <div style="color:rgba(255,255,255,.7); margin-bottom:14px;">
+                В момента имаш добавен само един автомобил. Добави още един и сравнението ще стане много по-полезно.
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">Добави още</a>
+
+                <form asp-controller="Compare" asp-action="Clear" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="pd-btn">Изчисти</button>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="pd-surface" style="padding:16px;">
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th class="compare-feature-col">Характеристика</th>
+                            @foreach (var car in Model.Cars)
+                            {
+                                var imageUrl =
+                                car.Images?
+                                .OrderByDescending(i => i.IsMain)
+                                .ThenBy(i => i.SortOrder)
+                                .FirstOrDefault()?.Url
+                                ?? (string.IsNullOrWhiteSpace(car.ImageUrl) ? "/img/no-car.jpg" : car.ImageUrl);
+
+                                <th>
+                                    <div class="compare-car-top">
+                                        <img src="@imageUrl" alt="Автомобил" class="compare-car-img" />
+
+                                        <div class="compare-car-title">
+                                            @car.CarModel.Make.Name @car.CarModel.Name
+                                        </div>
+
+                                        <div class="compare-price">@car.Price.ToString("N0") €</div>
+
+                                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                            <a class="pd-btn pd-btn-primary"
+                                               asp-controller="Cars"
+                                               asp-action="Details"
+                                               asp-route-id="@car.Id">
+                                                Детайли
+                                            </a>
+
+                                            <form asp-controller="Compare" asp-action="Remove" method="post" style="margin:0;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="carId" value="@car.Id" />
+                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                                <button type="submit" class="pd-btn">Премахни</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td class="compare-feature-col">Марка и модел</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.CarModel.Make.Name @car.CarModel.Name</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Година</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.Year</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Цена</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.Price.ToString("N0") €</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Пробег</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.MileageKm.ToString("N0") км</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Гориво</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.FuelType</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Скоростна кутия</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.Transmission</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Кубатура</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.EngineCapacityCc cc</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Конски сили</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>@car.HorsePower hp</td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Статус</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>
+                                    @if (car.IsDeleted)
+                                    {
+                                        <span class="pd-badge">Изтрита</span>
+                                    }
+                                    else if (car.IsSold)
+                                    {
+                                        <span class="pd-badge">Продадена</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pd-badge">Налична</span>
+                                    }
+                                </td>
+                            }
+                        </tr>
+
+                        <tr>
+                            <td class="compare-feature-col">Описание</td>
+                            @foreach (var car in Model.Cars)
+                            {
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(car.Description))
+                                    {
+                                        <span style="color:rgba(255,255,255,.55);">Няма описание</span>
+                                    }
+                                    else
+                                    {
+                                        @car.Description
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

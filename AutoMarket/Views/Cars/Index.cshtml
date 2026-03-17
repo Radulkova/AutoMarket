@@ -6,7 +6,8 @@
 }
 
 <style>
-    .favorite-toggle-form {
+    .favorite-toggle-form,
+    .compare-toggle-form {
         margin: 0;
     }
 
@@ -101,6 +102,7 @@
                 Филтри
             </button>
             <a class="pd-btn" asp-action="Index">Изчисти</a>
+            <a class="pd-btn" asp-controller="Compare" asp-action="Index">Към сравнението</a>
             <span style="color:rgba(255,255,255,.65); align-self:center;">Общо: @Model.TotalCount</span>
         </div>
     </div>
@@ -282,6 +284,15 @@
 
                         <div style="display:grid; gap:8px;">
                             <a class="pd-btn" asp-action="Details" asp-route-id="@car.Id">Виж детайли</a>
+
+                            <form asp-controller="Compare" asp-action="Add" method="post" class="compare-toggle-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="carId" value="@car.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="pd-btn pd-btn-primary" style="width:100%;">
+                                    Добави за сравнение
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,300 @@
+﻿@model AutoMarket.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Администраторско табло";
+}
+
+<style>
+    .admin-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .admin-stat-card {
+        padding: 18px;
+    }
+
+    .admin-stat-label {
+        color: rgba(255,255,255,.65);
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .admin-stat-value {
+        font-size: 34px;
+        font-weight: 900;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .admin-stat-note {
+        color: rgba(255,255,255,.55);
+        font-size: 13px;
+    }
+
+    .admin-table-wrap {
+        overflow-x: auto;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            vertical-align: middle;
+        }
+
+        .admin-table th {
+            color: rgba(255,255,255,.68);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .admin-table td {
+            color: rgba(255,255,255,.88);
+        }
+
+    .admin-status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.04);
+    }
+
+    .admin-status-active {
+        color: #b9ffcf;
+        border-color: rgba(100,255,160,.22);
+        background: rgba(100,255,160,.10);
+    }
+
+    .admin-status-sold {
+        color: #ffd8a8;
+        border-color: rgba(255,190,90,.24);
+        background: rgba(255,190,90,.10);
+    }
+
+    .admin-status-deleted {
+        color: #ffb3b3;
+        border-color: rgba(255,90,90,.24);
+        background: rgba(255,90,90,.10);
+    }
+
+    .admin-status-pending {
+        color: #ffe08a;
+        border-color: rgba(255,210,80,.24);
+        background: rgba(255,210,80,.10);
+    }
+
+    .admin-status-approved {
+        color: #b9ffcf;
+        border-color: rgba(100,255,160,.22);
+        background: rgba(100,255,160,.10);
+    }
+
+    .admin-status-rejected {
+        color: #ffb3b3;
+        border-color: rgba(255,90,90,.24);
+        background: rgba(255,90,90,.10);
+    }
+
+    @@media (max-width: 1100px) {
+        .admin-cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .admin-cards-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="pd-container">
+
+    <div class="pd-hero" style="margin-bottom:18px;">
+        <h1>Администраторско табло</h1>
+        <p>
+            Централизирано място за преглед на автомобилите и резервациите в системата.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Create">Добави автомобил</a>
+            <a class="pd-btn" asp-controller="CarModels" asp-action="Create">Добави модел</a>
+            <a class="pd-btn" asp-controller="Orders" asp-action="All">Към резервациите</a>
+        </div>
+    </div>
+
+    <div class="admin-cards-grid">
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Общо автомобили</div>
+            <div class="admin-stat-value">@Model.TotalCars</div>
+            <div class="admin-stat-note">Всички записи в каталога</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Активни автомобили</div>
+            <div class="admin-stat-value">@Model.ActiveCars</div>
+            <div class="admin-stat-note">Налични и видими обяви</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Продадени автомобили</div>
+            <div class="admin-stat-value">@Model.SoldCars</div>
+            <div class="admin-stat-note">Маркирани като продадени</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Изтрити автомобили</div>
+            <div class="admin-stat-value">@Model.DeletedCars</div>
+            <div class="admin-stat-note">Скрити чрез soft delete</div>
+        </div>
+    </div>
+
+    <div class="admin-cards-grid">
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Общо резервации</div>
+            <div class="admin-stat-value">@Model.TotalOrders</div>
+            <div class="admin-stat-note">Всички активни заявки</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Чакащи резервации</div>
+            <div class="admin-stat-value">@Model.PendingOrders</div>
+            <div class="admin-stat-note">Изискват администраторско действие</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Одобрени резервации</div>
+            <div class="admin-stat-value">@Model.ApprovedOrders</div>
+            <div class="admin-stat-note">Потвърдени огледи</div>
+        </div>
+
+        <div class="pd-surface admin-stat-card">
+            <div class="admin-stat-label">Отхвърлени резервации</div>
+            <div class="admin-stat-value">@Model.RejectedOrders</div>
+            <div class="admin-stat-note">Непотвърдени заявки</div>
+        </div>
+    </div>
+
+    <div class="pd-surface" style="padding:16px; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+            <div style="font-size:20px; font-weight:900;">Последно добавени автомобили</div>
+            <a class="pd-btn" asp-controller="Cars" asp-action="Index">Виж всички обяви</a>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Автомобил</th>
+                        <th>Година</th>
+                        <th>Цена</th>
+                        <th>Статус</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.LatestCars.Any())
+                    {
+                        @foreach (var car in Model.LatestCars)
+                        {
+                            var statusClass = car.IsDeleted
+                            ? "admin-status-deleted"
+                            : car.IsSold
+                            ? "admin-status-sold"
+                            : "admin-status-active";
+
+                            var statusText = car.IsDeleted
+                            ? "Изтрита"
+                            : car.IsSold
+                            ? "Продадена"
+                            : "Активна";
+
+                            <tr>
+                                <td>@car.Id</td>
+                                <td>@car.Make @car.Model</td>
+                                <td>@car.Year</td>
+                                <td>@car.Price.ToString("N0") €</td>
+                                <td>
+                                    <span class="admin-status-badge @statusClass">@statusText</span>
+                                </td>
+                                <td>
+                                    <a class="pd-btn" asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id">Детайли</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">Няма налични автомобили.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pd-surface" style="padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+            <div style="font-size:20px; font-weight:900;">Последни резервации</div>
+            <a class="pd-btn" asp-controller="Orders" asp-action="All">Управлявай резервациите</a>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Автомобил</th>
+                        <th>Клиент</th>
+                        <th>Телефон</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.LatestOrders.Any())
+                    {
+                        @foreach (var order in Model.LatestOrders)
+                        {
+                            var statusClass = order.StatusText == "Чакаща"
+                            ? "admin-status-pending"
+                            : order.StatusText == "Одобрена"
+                            ? "admin-status-approved"
+                            : "admin-status-rejected";
+
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.CarName</td>
+                                <td>@order.ClientName</td>
+                                <td>@order.Phone</td>
+                                <td>
+                                    <span class="admin-status-badge @statusClass">@order.StatusText</span>
+                                </td>
+                                <td>@order.CreatedOn.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">Няма резервации.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

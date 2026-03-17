@@ -1,4 +1,5 @@
 ﻿@using AutoMarket.Services
+@using System.Text.Json
 @inject IOrderService OrdersService
 
 @{
@@ -6,6 +7,22 @@
     if (User.IsInRole("Admin"))
     {
         pendingCount = await OrdersService.GetPendingCountAsync();
+    }
+
+    var compareCount = 0;
+    var compareJson = Context.Session.GetString(ICompareService.SessionKey);
+
+    if (!string.IsNullOrWhiteSpace(compareJson))
+    {
+        try
+        {
+            var compareIds = JsonSerializer.Deserialize<List<int>>(compareJson);
+            compareCount = compareIds?.Count ?? 0;
+        }
+        catch
+        {
+            compareCount = 0;
+        }
     }
 }
 
@@ -63,6 +80,20 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link text-white"
+                               asp-controller="Compare"
+                               asp-action="Index">
+                                Сравнение
+                                @if (compareCount > 0)
+                                {
+                                    <span class="badge bg-warning text-dark ms-2" style="border-radius:999px;">
+                                        @compareCount
+                                    </span>
+                                }
+                            </a>
+                        </li>
+
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
@@ -87,6 +118,14 @@
 
                         @if (User.IsInRole("Admin"))
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-white"
+                                   asp-controller="Admin"
+                                   asp-action="Index">
+                                    Табло
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-white"
                                    asp-controller="Cars"

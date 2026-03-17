@@ -26,7 +26,8 @@
 }
 
 <style>
-    .favorite-toggle-form {
+    .favorite-toggle-form,
+    .compare-toggle-form {
         margin: 0;
     }
 
@@ -64,6 +65,29 @@
             width: 26px;
             height: 26px;
             display: block;
+        }
+
+    .compare-highlight-btn {
+        min-height: 52px;
+        padding: 0 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(80, 210, 255, .35);
+        background: linear-gradient(135deg, rgba(0, 153, 255, .95), rgba(0, 200, 255, .88));
+        color: #ffffff;
+        font-weight: 800;
+        box-shadow: 0 10px 24px rgba(0, 153, 255, .22);
+        transition: all .2s ease;
+    }
+
+        .compare-highlight-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(0, 153, 255, .28);
+            filter: brightness(1.05);
+        }
+
+        .compare-highlight-btn:focus,
+        .compare-highlight-btn:active {
+            color: #ffffff;
         }
 
     .details-top-actions {
@@ -166,6 +190,15 @@
                             </button>
                         </form>
 
+                        <form asp-controller="Compare" asp-action="Add" method="post" class="compare-toggle-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="carId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="compare-highlight-btn">
+                                Добави за сравнение
+                            </button>
+                        </form>
+
                         if (!Model.IsSold)
                         {
                             <button type="button"
@@ -185,14 +218,27 @@
                     }
                     else
                     {
-                        <p style="margin:0;">
-                            <a asp-area="Identity" asp-page="/Account/Login">Влез</a>, за да добавиш в Любими и да резервираш оглед.
-                        </p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <form asp-controller="Compare" asp-action="Add" method="post" class="compare-toggle-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="carId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="compare-highlight-btn">
+                                    Добави за сравнение
+                                </button>
+                            </form>
+
+                            <p style="margin:0; align-self:center;">
+                                <a asp-area="Identity" asp-page="/Account/Login">Влез</a>, за да добавиш в Любими и да резервираш оглед.
+                            </p>
+                        </div>
                     }
                 </div>
 
                 <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
                     <a class="pd-btn pd-btn-primary" asp-controller="Cars" asp-action="Index">← Назад към обявите</a>
+
+                    <a class="pd-btn" asp-controller="Compare" asp-action="Index">Към сравнението</a>
 
                     <button type="button" class="pd-btn pd-btn-primary"
                             data-bs-toggle="modal" data-bs-target="#contactSellerModal">
