@@ -21,6 +21,11 @@ namespace AutoMarket.Controllers
             string? fuelType,
             string? transmission)
         {
+            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
             var makes = await carService.GetMakesAsync();
             var models = await carService.GetModelsAsync(makeId);
 
